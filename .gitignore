@@ -1,0 +1,38 @@
+# Secrets: never commit. Copy .env.example to .env and fill it locally.
+.env
+*.pem
+*service-account*.json
+gcp-key*.json
+
+# Local data (raw landing files and the DuckDB warehouse are rebuilt by the pipeline)
+data/
+*.duckdb
+*.duckdb.wal
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+logs/
+
+# Reconciliation reports are built in CI and published to GitHub Pages
+reports/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
