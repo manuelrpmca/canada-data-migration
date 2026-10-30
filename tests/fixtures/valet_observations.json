@@ -1,12 +1,46 @@
 {
-  "terms": {"url": "https://www.bankofcanada.ca/terms/"},
-  "seriesDetail": {
-    "FXUSDCAD": {"label": "USD/CAD", "description": "SYNTHETIC FIXTURE", "dimension": {"key": "d", "name": "date"}}
-  },
-  "observations": [
-    {"d": "2026-01-02", "FXUSDCAD": {"v": "1.1000"}},
-    {"d": "2026-01-05", "FXUSDCAD": {"v": "1.2000"}},
-    {"d": "2026-01-06", "FXUSDCAD": {"v": ""}},
-    {"d": "2026-01-07", "FXUSDCAD": {"v": "1.3000"}}
-  ]
+    "terms": {
+        "url": "https://www.bankofcanada.ca/terms/"
+    },
+    "seriesDetail": {
+        "FXUSDCAD": {
+            "label": "USD/CAD",
+            "description": "Daily average exchange rate of the US dollar in Canadian dollars.",
+            "dimension": {
+                "key": "d",
+                "name": "Date"
+            },
+            "dateFormat": "daily",
+            "metadata": {
+                "unit": "Canadian dollars per US dollar",
+                "frequency": "Business daily"
+            }
+        }
+    },
+    "observations": [
+        {
+            "d": "2026-10-15",
+            "FXUSDCAD": {
+                "v": "1.4196"
+            }
+        },
+        {
+            "d": "2026-10-16",
+            "FXUSDCAD": {
+                "v": "1.4154"
+            }
+        },
+        {
+            "d": "2026-10-19",
+            "FXUSDCAD": {
+                "v": "1.4097"
+            }
+        },
+        {
+            "d": "2026-10-20",
+            "FXUSDCAD": {
+                "v": "1.4054"
+            }
+        }
+    ]
 }
