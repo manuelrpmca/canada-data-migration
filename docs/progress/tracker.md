@@ -2,7 +2,7 @@
 
 Live status of every milestone task. Updated in each pull request. Hours are the owner's actual hours, logged at milestone close; estimates live in the [plan](../plan.md).
 
-Last updated: 2026-10-29
+Last updated: 2026-10-30
 
 ## Milestones
 
@@ -35,8 +35,9 @@ Last updated: 2026-10-29
 | Raw landing, DuckDB upsert, lookback window, run log | Claude | Done | PR #2 |
 | CLI: `cdm ingest`, `status`, `verify`, `find-vector` | Claude | Done | PR #2 |
 | Unit tests on fixtures, no network | Claude | Done | PR #2 |
-| Confirm series identifiers against the live APIs; set StatCan vector IDs | Claude | Blocked: API hosts not reachable from Claude's environment | |
-| Replace hand-written fixtures with recorded responses | Claude | Blocked: same | |
+| Confirm series identifiers against the live APIs; set StatCan vector IDs | Claude | Done | PR #3 |
+| Replace hand-written fixtures with recorded responses | Claude | Done | PR #3 |
+| First real ingest (two runs, idempotent) and results in the M1 note | Claude | Done | PR #3 |
 | Run the M1 QA script on Windows 11 | Manuel | Not started | [QA M1](../qa/m1-ingestion.md) |
 
 ## Open questions
@@ -50,6 +51,8 @@ Last updated: 2026-10-29
 
 | Date | Event |
 | --- | --- |
+| 2026-10-30 | Series identifiers verified live; StatCan vectors 41691919 and 2063949 set; first real ingest recorded in the M1 note. |
+| 2026-10-30 | PR #2 merged: M1 ingestion code. |
 | 2026-10-29 | M1 started on branch `feat/m1-ingestion`. |
 | 2026-10-29 | PR #1 merged: plan, ADRs 0001-0008 accepted. |
 | 2026-10-29 | Repository created (public, empty README). Plan proposed in PR #1. |

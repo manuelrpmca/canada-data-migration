@@ -24,7 +24,9 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("verify", help="check every series identifier against the live APIs")
     p_find = sub.add_parser("find-vector", help="StatCan: vector ID for a table coordinate")
     p_find.add_argument("product_id", type=int)
-    p_find.add_argument("coordinate", help='e.g. "1.2.0.0.0.0.0.0.0.0"')
+    p_find.add_argument(
+        "coordinate", help='member IDs per dimension, e.g. "14.2" (padded to 10 positions)'
+    )
 
     args = parser.parse_args(argv)
     db_path = args.db or settings.default_db_path()

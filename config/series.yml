@@ -3,7 +3,7 @@
 # lookback: how far before the latest loaded period each run re-requests, to capture revisions
 #   (ADR 0005). Daily series use calendar days; monthly series use periods (months).
 # verified: true only after the identifier was checked against the live API with `uv run cdm verify`.
-#   StatCan vector IDs stay empty until then; `cdm ingest` skips a series without an identifier.
+#   `cdm ingest` skips a series without an identifier.
 
 series:
   - key: usd_cad
@@ -14,7 +14,7 @@ series:
     frequency: daily
     start_date: "2017-01-01"
     lookback: 14
-    verified: false
+    verified: true
 
   - key: policy_rate
     source: valet
@@ -24,26 +24,27 @@ series:
     frequency: daily
     start_date: "2017-01-01"
     lookback: 14
-    verified: false
+    verified: true
 
   - key: cpi_ontario
     source: statcan
     product_id: 18100004   # Consumer Price Index, monthly, not seasonally adjusted
-    series_id: null        # vector ID for "All-items, Ontario"; set after `cdm verify`
+    series_id: "41691919"  # coordinate 14.2: "Ontario;All-items" (verified 2026-10-30)
     name: Consumer Price Index, all-items, Ontario
     unit: index (2002=100)
     frequency: monthly
     start_date: "2017-01-01"
     lookback: 3
-    verified: false
+    verified: true
 
   - key: unemployment_ontario
     source: statcan
-    product_id: 14100287   # Labour force characteristics, monthly, seasonally adjusted
-    series_id: null        # vector ID for "Unemployment rate, Ontario, both sexes, 15+, SA"; set after `cdm verify`
+    product_id: 14100287   # Labour force characteristics, monthly, seasonally adjusted and trend-cycle
+    series_id: "2063949"   # coordinate 7.7.1.1.1.1 (verified 2026-10-30): Ontario; Unemployment rate;
+                           # Total - Gender; 15 years and over; Estimate; Seasonally adjusted
     name: Unemployment rate, Ontario, seasonally adjusted
     unit: percent
     frequency: monthly
     start_date: "2017-01-01"
     lookback: 3
-    verified: false
+    verified: true

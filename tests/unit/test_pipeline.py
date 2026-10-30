@@ -48,9 +48,9 @@ def test_ingest_twice_is_idempotent(tmp_path, daily_series, valet_client):
     first = pipeline.ingest([daily_series], con, valet_client, tmp_path, clock=clock)
     second = pipeline.ingest([daily_series], con, valet_client, tmp_path, clock=clock)
 
-    assert (first[0].status, first[0].inserted) == ("success", 3)
-    assert (second[0].inserted, second[0].updated, second[0].unchanged) == (0, 0, 3)
-    assert con.execute("SELECT count(*) FROM raw.observations").fetchone() == (3,)
+    assert (first[0].status, first[0].inserted) == ("success", 4)
+    assert (second[0].inserted, second[0].updated, second[0].unchanged) == (0, 0, 4)
+    assert con.execute("SELECT count(*) FROM raw.observations").fetchone() == (4,)
     assert con.execute("SELECT count(*) FROM raw.run_log").fetchone() == (2,)
     landed = sorted((tmp_path / "raw" / "valet" / "usd_cad").glob("*.json"))
     assert len(landed) == 2

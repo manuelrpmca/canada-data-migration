@@ -16,6 +16,7 @@ from cdm.http import request_with_retry
 from cdm.sources import FetchResult, Observation
 
 BASE_URL = "https://www150.statcan.gc.ca/t1/wds/rest"
+COORDINATE_POSITIONS = 10
 
 
 class WdsError(RuntimeError):
@@ -73,10 +74,24 @@ def describe_cube(client: httpx.Client, product_id: int) -> dict:
     return response.json()
 
 
+def pad_coordinate(coordinate: str) -> str:
+    """Pad to the 10 positions WDS needs: "14.2" -> "14.2.0.0.0.0.0.0.0.0".
+
+    A shorter coordinate is answered with HTTP 406 (seen live on 2026-10-30).
+    """
+    parts = coordinate.strip(".").split(".")
+    if len(parts) > COORDINATE_POSITIONS:
+        raise ValueError(f"coordinate has more than {COORDINATE_POSITIONS} positions: {coordinate}")
+    return ".".join(parts + ["0"] * (COORDINATE_POSITIONS - len(parts)))
+
+
 def find_vector(client: httpx.Client, product_id: int, coordinate: str) -> dict:
     """Series metadata (including vectorId) for one coordinate of a table."""
     url = f"{BASE_URL}/getSeriesInfoFromCubePidCoord"
     response = request_with_retry(
-        client, "POST", url, json=[{"productId": int(product_id), "coordinate": coordinate}]
+        client,
+        "POST",
+        url,
+        json=[{"productId": int(product_id), "coordinate": pad_coordinate(coordinate)}],
     )
     return response.json()
