@@ -29,9 +29,10 @@ Public portfolio project: ingest Canadian open data, load a "legacy" Oracle sour
 
 ## Current state
 
-- Phase: 0 (foundations). Milestone M0 in review.
-- Owner time: 16-20 hours per week.
-- Next: M1 ingestion, starting with confirming the series identifiers against the live APIs.
+- Phase 1. M0 plan merged (PR #1); owner's Phase 0 tasks in progress. M1 ingestion in progress.
+- Owner time: 16-20 hours per week. Owner runs QA on Windows 11: QA scripts use PowerShell, no `make` or bash-only syntax.
+- Series identifiers are not yet verified against the live APIs; StatCan vector IDs are empty until `cdm verify` / `cdm find-vector` confirm them.
+- Test fixtures are hand-written and synthetic until replaced by recorded responses.
 
 ## Key facts checked (2026-10-29)
 

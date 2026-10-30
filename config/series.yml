@@ -1,0 +1,49 @@
+# Series ingested by `uv run cdm ingest`. See docs/decisions/0003-data-sources.md.
+#
+# lookback: how far before the latest loaded period each run re-requests, to capture revisions
+#   (ADR 0005). Daily series use calendar days; monthly series use periods (months).
+# verified: true only after the identifier was checked against the live API with `uv run cdm verify`.
+#   StatCan vector IDs stay empty until then; `cdm ingest` skips a series without an identifier.
+
+series:
+  - key: usd_cad
+    source: valet
+    series_id: FXUSDCAD
+    name: USD/CAD daily exchange rate
+    unit: CAD per USD
+    frequency: daily
+    start_date: "2017-01-01"
+    lookback: 14
+    verified: false
+
+  - key: policy_rate
+    source: valet
+    series_id: V39079
+    name: Target for the overnight rate
+    unit: percent
+    frequency: daily
+    start_date: "2017-01-01"
+    lookback: 14
+    verified: false
+
+  - key: cpi_ontario
+    source: statcan
+    product_id: 18100004   # Consumer Price Index, monthly, not seasonally adjusted
+    series_id: null        # vector ID for "All-items, Ontario"; set after `cdm verify`
+    name: Consumer Price Index, all-items, Ontario
+    unit: index (2002=100)
+    frequency: monthly
+    start_date: "2017-01-01"
+    lookback: 3
+    verified: false
+
+  - key: unemployment_ontario
+    source: statcan
+    product_id: 14100287   # Labour force characteristics, monthly, seasonally adjusted
+    series_id: null        # vector ID for "Unemployment rate, Ontario, both sexes, 15+, SA"; set after `cdm verify`
+    name: Unemployment rate, Ontario, seasonally adjusted
+    unit: percent
+    frequency: monthly
+    start_date: "2017-01-01"
+    lookback: 3
+    verified: false
