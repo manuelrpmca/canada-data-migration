@@ -1,0 +1,145 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: >
+      Calendar, one row per day, whole years from the first to the last observation.
+      is_business_day is inferred from the Bank of Canada's USD/CAD publication days
+      (see the model's SQL) and is null after the last USD/CAD observation.
+    columns:
+      - name: date_day
+        data_tests: [unique, not_null]
+      - name: month_start
+        data_tests: [not_null]
+      - name: month_end
+        data_tests: [not_null]
+      - name: iso_day_of_week
+        description: 1 = Monday ... 7 = Sunday.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4, 5, 6, 7]
+                quote: false
+
+  - name: dim_indicator
+    description: One row per indicator, with its publisher, licence and attribution text.
+    columns:
+      - name: indicator_key
+        data_tests: [unique, not_null]
+      - name: indicator_name
+        data_tests: [not_null]
+      - name: frequency
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["daily", "monthly"]
+      - name: publisher
+        description: Null would mean a source with no row in the source_publishers seed.
+        data_tests: [not_null]
+      - name: attribution
+        data_tests: [not_null]
+      - name: last_ref_date
+        description: Null would mean a configured series with no data loaded.
+        data_tests: [not_null]
+
+  - name: fct_observation
+    description: >
+      One row per indicator per reference date (long format). The grain is
+      (indicator_key, date_day), carried in observation_id.
+    columns:
+      - name: observation_id
+        data_tests: [unique, not_null]
+      - name: indicator_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_indicator')
+                field: indicator_key
+      - name: date_day
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_day
+      - name: value
+        data_tests: [not_null]
+
+  - name: mart_monthly_indicators
+    description: >
+      One row per month (wide format) for the dashboard. The latest months can have nulls
+      for series not yet published. For the current month, usd_cad_avg covers only the
+      days published so far (usd_cad_days) and policy_rate_end_of_month is the latest rate.
+    columns:
+      - name: month_start
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_day
+      - name: cpi_ontario
+        description: CPI all-items, Ontario, 2002=100, not seasonally adjusted.
+      - name: cpi_ontario_yoy_pct
+        description: Change from the same month a year earlier, percent, one decimal.
+      - name: unemployment_rate_ontario
+        description: Percent, seasonally adjusted.
+      - name: usd_cad_avg
+        description: Average of the daily USD/CAD rates published in the month (CAD per USD), four decimals like the source.
+      - name: usd_cad_days
+        description: Number of daily USD/CAD rates in the average.
+        data_tests: [not_null]
+      - name: policy_rate_end_of_month
+        description: Target for the overnight rate in effect on the last day of the month, percent.
+
+unit_tests:
+  - name: mart_monthly_indicators_rules
+    description: >
+      USD/CAD is averaged over the month, the policy rate is carried forward to month end,
+      and CPI year-over-year change uses the same month a year earlier.
+    model: mart_monthly_indicators
+    given:
+      - input: ref('dim_date')
+        rows:
+          - {month_start: 2025-01-01, month_end: 2025-01-31}
+          - {month_start: 2025-02-01, month_end: 2025-02-28}
+          - {month_start: 2025-03-01, month_end: 2025-03-31}
+          - {month_start: 2025-04-01, month_end: 2025-04-30}
+          - {month_start: 2025-05-01, month_end: 2025-05-31}
+          - {month_start: 2025-06-01, month_end: 2025-06-30}
+          - {month_start: 2025-07-01, month_end: 2025-07-31}
+          - {month_start: 2025-08-01, month_end: 2025-08-31}
+          - {month_start: 2025-09-01, month_end: 2025-09-30}
+          - {month_start: 2025-10-01, month_end: 2025-10-31}
+          - {month_start: 2025-11-01, month_end: 2025-11-30}
+          - {month_start: 2025-12-01, month_end: 2025-12-31}
+          - {month_start: 2026-01-01, month_end: 2026-01-31}
+          - {month_start: 2026-02-01, month_end: 2026-02-28}
+      - input: ref('fct_observation')
+        rows:
+          # Synthetic values, chosen to make the expected results easy to check by hand.
+          - {indicator_key: cpi_ontario, date_day: 2025-01-01, value: 100.0}
+          - {indicator_key: cpi_ontario, date_day: 2026-01-01, value: 103.0}
+          - {indicator_key: usd_cad, date_day: 2026-01-05, value: 1.30}
+          - {indicator_key: usd_cad, date_day: 2026-01-06, value: 1.40}
+          - {indicator_key: policy_rate, date_day: 2025-12-30, value: 2.25}
+          - {indicator_key: policy_rate, date_day: 2026-01-29, value: 2.50}
+          - {indicator_key: unemployment_ontario, date_day: 2026-02-01, value: 7.1}
+    expect:
+      rows:
+        - {month_start: 2025-01-01, cpi_ontario: 100.0, cpi_ontario_yoy_pct: null, usd_cad_avg: null, usd_cad_days: 0, policy_rate_end_of_month: null, unemployment_rate_ontario: null}
+        - {month_start: 2025-02-01, cpi_ontario: null, cpi_ontario_yoy_pct: null, usd_cad_avg: null, usd_cad_days: 0, policy_rate_end_of_month: null, unemployment_rate_ontario: null}
+        - {month_start: 2025-03-01, cpi_ontario: null, cpi_ontario_yoy_pct: null, usd_cad_avg: null, usd_cad_days: 0, policy_rate_end_of_month: null, unemployment_rate_ontario: null}
+        - {month_start: 2025-04-01, cpi_ontario: null, cpi_ontario_yoy_pct: null, usd_cad_avg: null, usd_cad_days: 0, policy_rate_end_of_month: null, unemployment_rate_ontario: null}
+        - {month_start: 2025-05-01, cpi_ontario: null, cpi_ontario_yoy_pct: null, usd_cad_avg: null, usd_cad_days: 0, policy_rate_end_of_month: null, unemployment_rate_ontario: null}
+        - {month_start: 2025-06-01, cpi_ontario: null, cpi_ontario_yoy_pct: null, usd_cad_avg: null, usd_cad_days: 0, policy_rate_end_of_month: null, unemployment_rate_ontario: null}
+        - {month_start: 2025-07-01, cpi_ontario: null, cpi_ontario_yoy_pct: null, usd_cad_avg: null, usd_cad_days: 0, policy_rate_end_of_month: null, unemployment_rate_ontario: null}
+        - {month_start: 2025-08-01, cpi_ontario: null, cpi_ontario_yoy_pct: null, usd_cad_avg: null, usd_cad_days: 0, policy_rate_end_of_month: null, unemployment_rate_ontario: null}
+        - {month_start: 2025-09-01, cpi_ontario: null, cpi_ontario_yoy_pct: null, usd_cad_avg: null, usd_cad_days: 0, policy_rate_end_of_month: null, unemployment_rate_ontario: null}
+        - {month_start: 2025-10-01, cpi_ontario: null, cpi_ontario_yoy_pct: null, usd_cad_avg: null, usd_cad_days: 0, policy_rate_end_of_month: null, unemployment_rate_ontario: null}
+        - {month_start: 2025-11-01, cpi_ontario: null, cpi_ontario_yoy_pct: null, usd_cad_avg: null, usd_cad_days: 0, policy_rate_end_of_month: null, unemployment_rate_ontario: null}
+        - {month_start: 2025-12-01, cpi_ontario: null, cpi_ontario_yoy_pct: null, usd_cad_avg: null, usd_cad_days: 0, policy_rate_end_of_month: 2.25, unemployment_rate_ontario: null}
+        - {month_start: 2026-01-01, cpi_ontario: 103.0, cpi_ontario_yoy_pct: 3.0, usd_cad_avg: 1.35, usd_cad_days: 2, policy_rate_end_of_month: 2.50, unemployment_rate_ontario: null}
+        - {month_start: 2026-02-01, cpi_ontario: null, cpi_ontario_yoy_pct: null, usd_cad_avg: null, usd_cad_days: 0, policy_rate_end_of_month: 2.50, unemployment_rate_ontario: 7.1}

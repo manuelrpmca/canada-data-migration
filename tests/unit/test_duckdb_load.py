@@ -63,3 +63,10 @@ def test_latest_ref_date(con):
 def test_empty_payload_is_a_no_op(con):
     counts = upsert(con, [])
     assert (counts.received, counts.inserted, counts.updated, counts.unchanged) == (0, 0, 0, 0)
+
+
+def test_sync_series_replaces_the_config_snapshot(con, daily_series, monthly_series):
+    warehouse.sync_series(con, [daily_series, monthly_series], NOW)
+    warehouse.sync_series(con, [daily_series], NOW)
+    rows = con.execute("SELECT series_key, frequency, synced_at FROM raw.series").fetchall()
+    assert rows == [("usd_cad", "daily", NOW)]

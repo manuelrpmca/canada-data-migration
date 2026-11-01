@@ -1,0 +1,13 @@
+# Connection profiles. No secrets here: DuckDB is a local file, and the BigQuery target (M5)
+# will read its credentials from the environment.
+#
+# CDM_DUCKDB_PATH is set by `uv run cdm run`. When dbt is run by hand from this folder,
+# the default points at the warehouse that `uv run cdm ingest` writes.
+cdm:
+  target: duckdb
+  outputs:
+    duckdb:
+      type: duckdb
+      path: "{{ env_var('CDM_DUCKDB_PATH', '../data/warehouse.duckdb') }}"
+      schema: main
+      threads: 4

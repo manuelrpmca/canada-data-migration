@@ -1,0 +1,33 @@
+# dbt project for the v0.1 warehouse (ADR 0007). Run from this folder with `uv run dbt build`,
+# or from the repository root with `uv run cdm run` (ingest + build).
+name: cdm
+version: "0.1.0"
+config-version: 2
+profile: cdm
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages", "logs"]
+
+flags:
+  send_anonymous_usage_stats: false
+
+models:
+  cdm:
+    staging:
+      +schema: staging
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table
+
+seeds:
+  cdm:
+    +schema: reference
+
+data_tests:
+  cdm:
+    +severity: error

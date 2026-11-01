@@ -1,0 +1,19 @@
+version: 2
+
+seeds:
+  - name: source_publishers
+    description: >
+      One row per data source system: who publishes it, under which licence, and the
+      attribution text every published output must carry (README, "Data attribution").
+    columns:
+      - name: source
+        description: Source system key, as used in config/series.yml.
+        data_tests: [unique, not_null]
+      - name: publisher
+        data_tests: [not_null]
+      - name: licence_name
+        data_tests: [not_null]
+      - name: licence_url
+        data_tests: [not_null]
+      - name: attribution
+        data_tests: [not_null]
