@@ -23,7 +23,18 @@ Date closed: open · Owner hours: to be logged
 
 ## Measured results
 
-Run on 2026-11-01 around 22:50 UTC in Claude's cloud environment, on a warehouse rebuilt from empty with `uv run cdm ingest`. The owner's QA run on Windows 11 is still to come.
+Run on 2026-11-01 around 22:50 UTC in Claude's cloud environment, on a warehouse rebuilt from empty with `uv run cdm ingest`. 
+
+Owner's QA run on Windows 11, 2026-11-02 around 15:05 UTC (PowerShell, VPN off):
+
+| Command | Result |
+| --- | --- |
+| `uv run pytest` | 42 passed (before PRs #6 and #7 added three tests) |
+| `uv run cdm run` | 4 series `success`; dbt PASS=66 WARN=0 ERROR=0 |
+| `uv run dbt source freshness` (from `dbt\`) | 4 of 4 PASS |
+| `uv run cdm dbt docs generate`, `uv run cdm dbt docs serve` | Catalog written; docs served at http://localhost:8080 |
+
+Found during the run and fixed: Statistics Canada answers 403 through the owner's VPN; `cdm` failed when run from `dbt\`; plain `dbt` failed outside `dbt\`. See the [QA troubleshooting table](../qa/README.md#troubleshooting-errors-seen-on-windows).
 
 | Command | Result |
 | --- | --- |

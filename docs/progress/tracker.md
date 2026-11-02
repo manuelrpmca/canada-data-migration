@@ -10,7 +10,7 @@ Last updated: 2026-11-02
 | --- | --- | --- | --- | --- | --- | --- |
 | M0. Foundations | In progress (plan merged) | Oct 29 - Nov 4 | 10-14 | | | [m0](../notes/m0-foundations.md) |
 | M1. Ingestion | In progress | Nov 2 - Nov 8 | 6-8 | | | [m1](../notes/m1-ingestion.md) |
-| M2. dbt models | In review (PR open) | Nov 9 - Nov 13 | 6-8 | | | [m2](../notes/m2-dbt-models.md) |
+| M2. dbt models | Merged; QA passed on Windows 11 | Nov 9 - Nov 13 | 6-8 | | 2026-11-02 | [m2](../notes/m2-dbt-models.md) |
 | M3. Automation and v0.1 | Not started | Nov 12 - Nov 20 | 5-7 | | | |
 
 ## M0 tasks
@@ -44,13 +44,14 @@ Last updated: 2026-11-02
 
 | Task | Owner | Status | Link |
 | --- | --- | --- | --- |
-| dbt project, DuckDB target, sources with per-series freshness | Claude | Done | M2 PR |
-| Staging models; `dim_date`, `dim_indicator`, `fct_observation`, `mart_monthly_indicators` | Claude | Done | M2 PR |
-| Generic and singular tests, unit test for the mart; `dbt docs generate` | Claude | Done | M2 PR |
-| `uv run cdm run` = ingest + `dbt build`; `cdm sql` for QA | Claude | Done | M2 PR |
-| Offline pytest that builds the dbt project on synthetic data | Claude | Done | M2 PR |
+| dbt project, DuckDB target, sources with per-series freshness | Claude | Done | PR #4 |
+| Staging models; `dim_date`, `dim_indicator`, `fct_observation`, `mart_monthly_indicators` | Claude | Done | PR #4 |
+| Generic and singular tests, unit test for the mart; `dbt docs generate` | Claude | Done | PR #4 |
+| `uv run cdm run` = ingest + `dbt build`; `cdm sql` for QA | Claude | Done | PR #4 |
+| Offline pytest that builds the dbt project on synthetic data | Claude | Done | PR #4 |
 | dbt Fundamentals course (before reviewing M2) | Manuel | Not started | |
-| Run the M2 QA script on Windows 11 | Manuel | Not started | [QA M2](../qa/m2-dbt-models.md) |
+| Run the M2 QA script on Windows 11 | Manuel | Done 2026-11-02 (break-a-test steps 7-9 optional, not run) | [QA M2](../qa/m2-dbt-models.md) |
+| Windows fixes found in QA: `cdm dbt`, root search from subfolders, troubleshooting table | Claude | Done | PRs #5, #6, #7 |
 
 ## Open questions
 
@@ -63,6 +64,7 @@ Last updated: 2026-11-02
 
 | Date | Event |
 | --- | --- |
+| 2026-11-02 | Owner's M2 QA on Windows 11: `cdm run` PASS=66 ERROR=0, freshness 4 of 4 PASS, docs generated and served. PRs #6 and #7 merged. |
 | 2026-11-02 | QA scripts made Windows-first after the owner's first Windows run (repo not cloned, uv not on PATH). PR #4 (M2) and PR #5 merged. |
 | 2026-11-01 | M2 dbt models built; `dbt build` PASS=66 on real data. PR opened. |
 | 2026-10-30 | PR #3 merged: live ID verification and first real ingest. |
