@@ -12,7 +12,8 @@ Anyone writing or changing a QA script follows these rules, so a script runs top
 4. **One command per line,** with the expected result in a `#` comment. Comments can be pasted with the command.
 5. **Quoting:** SQL passed to `cdm sql` goes in double quotes, with single quotes inside for strings.
 6. **New tools** need an install line and a check line (for example `uv --version`), and the PATH line if the installer adds a folder to PATH.
-7. Every new error the owner hits goes into the troubleshooting table below in the same pull request as the fix.
+7. **Restart from the top after any merge.** If a pull request is merged while you are running a script, start again from its first line: `git pull` brings the change to your machine, and a command added by that change does not exist until then.
+8. Every new error the owner hits goes into the troubleshooting table below in the same pull request as the fix.
 
 ## One-time setup (copy into each script)
 
@@ -41,3 +42,4 @@ If the repository is already cloned, skip step 3. If it is cloned somewhere othe
 | `403 Forbidden` from `www150.statcan.gc.ca` in `cdm ingest` or `cdm run` (Bank of Canada works) | Statistics Canada blocks requests from some VPN exit addresses; seen 2026-11-02 with a VPN on, gone with it off | Turn the VPN off and run `uv run cdm run` again. To check: open https://www150.statcan.gc.ca/t1/wds/rest/getCodeSets in the browser; JSON means the network is fine |
 | `FileNotFoundError: ...\dbt\config\series.yml` from `uv run cdm ...` | `cdm` was run inside `dbt\`; before 2026-11-02 it only looked for `config\` in the current folder | Fixed: `cdm` now finds the repository root from any subfolder. On an older checkout, `cd $HOME\canada-data-migration` first |
 | `Error: Invalid value for '--profiles-dir': Path 'C:\Users\<you>\.dbt' does not exist` | `uv run dbt ...` was run outside the `dbt\` folder, so dbt looked for its profile in the home folder | Use `uv run cdm dbt ...` from the repository folder (added 2026-11-02); it works from any folder |
+| `cdm: error: argument command: invalid choice: 'dbt'` (or another new command) | The pull request that added the command is merged on GitHub but not pulled to this machine | `cd $HOME\canada-data-migration`, then `git pull`, then run the command again |

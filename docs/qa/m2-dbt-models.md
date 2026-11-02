@@ -22,7 +22,7 @@ The script below starts with `cd $HOME\canada-data-migration`. If you cloned the
 
 ## Script
 
-Run the commands one at a time; the text after `#` is a comment and can be pasted too.
+Run the commands one at a time, always from the first line: `git pull` brings the latest version to your machine. The text after `#` is a comment and can be pasted too. If a command fails, look it up in [Troubleshooting](README.md#troubleshooting-errors-seen-on-windows).
 
 ```powershell
 cd $HOME\canada-data-migration
