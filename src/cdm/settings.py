@@ -33,7 +33,16 @@ class Series:
 
 
 def project_root() -> Path:
-    return Path(os.environ.get("CDM_ROOT", Path.cwd()))
+    """CDM_ROOT if set; else the nearest folder, from the current one upwards, that holds
+    config/series.yml. So `cdm` works from any subfolder of the repository (for example dbt/).
+    Falls back to the current folder."""
+    if "CDM_ROOT" in os.environ:
+        return Path(os.environ["CDM_ROOT"])
+    cwd = Path.cwd()
+    for folder in (cwd, *cwd.parents):
+        if (folder / "config" / "series.yml").is_file():
+            return folder
+    return cwd
 
 
 def data_dir() -> Path:

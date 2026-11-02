@@ -21,6 +21,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- `cdm` finds the repository root from any subfolder (for example `dbt\`), instead of failing with `FileNotFoundError` on `config\series.yml`.
 - `cdm find-vector` pads the coordinate to the 10 positions WDS requires (a shorter one returned HTTP 406).
 
 - Project plan for Phase 0 and Phase 1: repository structure, ADRs 0001-0009, milestone plan with QA scripts, progress tracker and milestone note for M0.
