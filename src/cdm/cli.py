@@ -37,18 +37,38 @@ def main(argv: list[str] | None = None) -> int:
         "coordinate", help='member IDs per dimension, e.g. "14.2" (padded to 10 positions)'
     )
 
+    argv, dbt_args = _split_dbt_args(sys.argv[1:] if argv is None else list(argv))
     args = parser.parse_args(argv)
+    if args.command == "dbt":
+        args.dbt_args = dbt_args
     db_path = args.db or settings.default_db_path()
     commands = {
         "ingest": lambda: _ingest(db_path, args.series),
         "run": lambda: _run(db_path, args.skip_ingest),
-        "dbt": lambda: 0 if transform.run(db_path, args.dbt_args) else 1,
+        "dbt": lambda: _dbt(db_path, args.dbt_args),
         "status": lambda: _status(db_path),
         "sql": lambda: _sql(db_path, args.statement),
         "verify": _verify,
         "find-vector": lambda: _find_vector(args.product_id, args.coordinate),
     }
     return commands[args.command]()
+
+
+def _split_dbt_args(argv: list[str]) -> tuple[list[str], list[str]]:
+    """Everything after the `dbt` command goes to dbt untouched. argparse alone would reject
+    options such as `cdm dbt --version`, because REMAINDER does not start with an option."""
+    i = 0
+    while i < len(argv):
+        token = argv[i]
+        if token == "--db":
+            i += 2
+        elif token.startswith("--db="):
+            i += 1
+        elif token == "dbt":
+            return argv[: i + 1], argv[i + 1 :]
+        else:
+            break
+    return argv, []
 
 
 def _ingest(db_path: Path, only: list[str] | None) -> int:
@@ -86,16 +106,34 @@ def _run(db_path: Path, skip_ingest: bool) -> int:
         print()
     else:
         code = 0
-    if not db_path.exists():
-        print(f"No warehouse at {db_path}. Run `uv run cdm ingest` first.")
+    if _missing_warehouse(db_path):
         return 1
     ok = transform.build(db_path)
     return 0 if ok and code == 0 else 1
 
 
+def _missing_warehouse(db_path: Path) -> bool:
+    """True (after printing what to do) when the DuckDB file does not exist yet."""
+    if db_path.exists():
+        return False
+    print(
+        f"No warehouse at {db_path}.\n"
+        "Create it with `uv run cdm run` (downloads the data, then builds the dbt models).",
+        file=sys.stderr,
+    )
+    return True
+
+
+def _dbt(db_path: Path, dbt_args: list[str]) -> int:
+    # dbt-duckdb would silently create an empty warehouse file; say what to run instead.
+    needs_warehouse = dbt_args and dbt_args[0] not in ("--help", "-h", "--version")
+    if needs_warehouse and _missing_warehouse(db_path):
+        return 1
+    return 0 if transform.run(db_path, dbt_args) else 1
+
+
 def _sql(db_path: Path, statement: str) -> int:
-    if not db_path.exists():
-        print(f"No warehouse at {db_path}. Run `uv run cdm ingest` first.")
+    if _missing_warehouse(db_path):
         return 1
     con = warehouse.connect(db_path)
     try:
@@ -113,8 +151,7 @@ def _sql(db_path: Path, statement: str) -> int:
 
 
 def _status(db_path: Path) -> int:
-    if not db_path.exists():
-        print(f"No warehouse at {db_path}. Run `uv run cdm ingest` first.")
+    if _missing_warehouse(db_path):
         return 1
     con = warehouse.connect(db_path)
     rows = warehouse.status(con)

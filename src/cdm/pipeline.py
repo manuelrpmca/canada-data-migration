@@ -11,6 +11,7 @@ from pathlib import Path
 import duckdb
 import httpx
 
+from cdm.http import RetryError
 from cdm.landing import land
 from cdm.load import duckdb as warehouse
 from cdm.settings import Series
@@ -88,11 +89,32 @@ def ingest(
                 counts.received, counts.inserted, counts.updated, counts.unchanged,
             )  # fmt: skip
         except Exception as exc:  # one failing series must not stop the others
-            message = f"{type(exc).__name__}: {exc}"
+            message = describe_error(exc)
             result = SeriesResult(series.key, "failed", start, message=message)
         _log(con, run_id, series, started_at, clock(), result, landed)
         results.append(result)
     return results
+
+
+VPN_HINT = (
+    "access denied. A VPN or company network often causes this: turn it off and run again "
+    "(docs/qa/README.md, Troubleshooting)"
+)
+NETWORK_HINT = "no connection to the server: check the internet connection, proxy or firewall"
+
+
+def describe_error(exc: Exception) -> str:
+    """One line for the CLI table and raw.run_log: what failed and, for errors seen in QA,
+    the likely cause. httpx messages span two lines with a generic link; keep the first."""
+    first_line = str(exc).splitlines()[0] if str(exc) else ""
+    message = f"{type(exc).__name__}: {first_line}"
+    if isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code == 403:
+        return f"{message} -> {VPN_HINT}"
+    if isinstance(exc, httpx.ConnectError) or (
+        isinstance(exc, RetryError) and "ConnectError" in first_line
+    ):
+        return f"{message} -> {NETWORK_HINT}"
+    return message
 
 
 def _naive_utc(moment: datetime) -> datetime:

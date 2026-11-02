@@ -57,7 +57,8 @@ Public portfolio project: ingest Canadian open data, load a "legacy" Oracle sour
 
 ## Current state
 
-- Phase 1. M0 plan merged (PR #1); owner's Phase 0 tasks in progress. M1 ingestion merged (PRs #2, #3), owner QA pending. M2 dbt models in review.
+- Phase 1. M0 plan merged (PR #1); owner's Phase 0 tasks in progress. M1 ingestion merged (PRs #2, #3). M2 dbt models merged, owner QA passed 2026-11-02. M3 (CI, daily run, README v0.1) in review in PR #10; then the owner's QA, a release PR and the `v0.1` release, published by the owner.
+- CI: `.github/workflows/ci.yml` (Linux and Windows, no network) and `daily.yml` (live APIs, 15:00 UTC, warehouse kept in the Actions cache under `warehouse-v1-`; bump the version when the raw schema changes). Actions are pinned to commit SHAs. A multi-line `pwsh` step fails only on its last command, so keep one command per step.
 - Owner time: 16-20 hours per week. Owner runs QA on Windows 11: QA scripts use PowerShell, no `make` or bash-only syntax.
 - Series identifiers verified against the live APIs on 2026-10-30 (see the [M1 note](docs/notes/m1-ingestion.md)). StatCan vectors: CPI Ontario 41691919, unemployment rate Ontario 2063949.
 - Test fixtures are trimmed responses recorded on 2026-10-30; edge cases (empty or null values) use inline synthetic payloads in the tests.

@@ -1,29 +1,36 @@
 # QA script: M3 Automation and v0.1
 
-Run after the M3 pull requests are merged and before approving the `v0.1` tag. About 20 minutes.
+Run after the M3 pull request is merged and before approving the `v0.1` tag. About 20 minutes: 5 in the browser, 10 in PowerShell, 5 for the README.
 
-## CI and schedule
+Before you start: **turn the VPN off** (Statistics Canada answers 403 through it, see [troubleshooting](README.md#troubleshooting-errors-seen-on-windows)).
 
-- [ ] The last pull request shows the CI check green, with lint, tests and `dbt build` steps.
-- [ ] Actions > `daily` > Run workflow (manual run) finishes green; the DuckDB file and run log appear as artifacts.
-- [ ] The scheduled run has run at least once on its own and is green.
-- [ ] The CI badge on the README is green.
+What was verified before this script was handed over, so a failure here is news: CI green on `ubuntu-latest` and `windows-latest`; the daily workflow run against the live APIs on GitHub; `uv run cdm run` from a clean checkout on `windows-latest`; the PowerShell part below run from a fresh clone on Linux (Claude has no Windows machine; the Windows CI jobs stand in for it).
 
-## Fresh-machine test (the "one command" promise)
+## Part 1. In the browser (GitHub)
 
-In a new folder, ideally on a second machine or a fresh user account. If uv is not installed there, run steps 1 and 2 of the [one-time setup](README.md#one-time-setup-copy-into-each-script) first.
+1. Open the merged pull request. Expected: four green checks, `test (ubuntu-latest)`, `test (windows-latest)`, `run` and `windows-fresh-run`.
+2. Open **Actions > daily > Run workflow**, keep branch `main`, click **Run workflow**. Expected after about one minute: green. Open the run: the summary shows a table with four series and today's date as the last run, and an artifact named `daily-<number>` is listed.
+3. The README on the repository home page shows two badges, `ci` and `daily`, both green.
+4. The next day after 15:00 UTC (10:00 or 11:00 in Toronto), **Actions > daily** shows a run started by `schedule`, green, with "Warehouse restored from cache: warehouse-v1-..." in its summary.
+
+## Part 2. In PowerShell (your machine)
+
+If this machine has never run the project, do the [one-time setup](README.md#one-time-setup-copy-into-each-script) first.
 
 ```powershell
-cd $HOME
-git clone https://github.com/manuelrpmca/canada-data-migration.git cdm-fresh
-cd $HOME\cdm-fresh
-Measure-Command { uv run cdm run | Out-Default }   # the one command from the README; expected: all tests pass, then the duration
+cd $HOME\canada-data-migration
+git checkout main
+git pull                                  # expected: the M3 files arrive (.github/workflows/ci.yml, daily.yml)
+uv run pytest                             # expected: 56 passed
+uv run cdm run                            # expected: 4 series "success", then "Done. PASS=66 WARN=0 ERROR=0"
+uv run cdm dbt source freshness           # expected: 4 of 4 PASS
+uv run cdm dbt --version                  # expected: "Core:" and an installed dbt version (this failed before M3)
+uv run cdm --db nowhere.duckdb status     # expected: "No warehouse at nowhere.duckdb." and how to create it
 ```
 
-- [ ] It works with no steps other than installing uv.
-- [ ] Write the real duration (`TotalMinutes` above) in the M3 note (it may go in the README).
+- [ ] Every expected result matched. If one did not, paste that command's full output in the chat and stop there.
 
-## README (60-second test)
+## Part 3. README (60-second test)
 
 Ask someone who has not seen the project to read the README for 60 seconds, then answer:
 
@@ -31,9 +38,9 @@ Ask someone who has not seen the project to read the README for 60 seconds, then
 - [ ] How do you run it?
 - [ ] What are its limits?
 
-## Release
+## Part 4. Release (you approve; nothing public happens before)
 
-- [ ] CHANGELOG has a `0.1.0` section dated today.
-- [ ] Every number in the README comes from a real run (no estimates).
-- [ ] The "Work in progress" banner is replaced by the v0.1 status.
-- [ ] You approve the tag and release notes (they are public).
+- [ ] Every number in the README comes from a real run (dates and commands are in the table).
+- [ ] The README status line says v0.1, not "Work in progress".
+- [ ] Write your hours and one line of what you learned in the [M3 note](../notes/m3-automation-v0.1.md) (or send them in the chat).
+- [ ] Say "OK v0.1" in the chat. Claude then opens the release pull request (CHANGELOG `0.1.0` dated that day, version 0.1.0, your QA results) with the release notes in it. After you merge it, you publish the release yourself: **Releases > Draft a new release**, tag `v0.1` on `main`, paste the notes, **Publish**. Publishing is the public step, so it stays in your hands.

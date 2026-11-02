@@ -1,0 +1,57 @@
+# Checks on every pull request and push to main (ADR 0008). No network calls to the data APIs:
+# unit tests use recorded fixtures and the dbt build runs on a synthetic warehouse, so CI is
+# deterministic. Windows runs too, because the owner's QA runs on Windows 11 (M2 retrospective).
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    defaults:
+      run:
+        shell: pwsh  # the owner's shell; the same commands as the QA scripts
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
+        with:
+          enable-cache: true
+
+      - name: Install (locked)
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Format
+        run: uv run ruff format --check .
+
+      - name: Tests, including dbt build on a synthetic warehouse
+        run: uv run pytest
+
+      # One command per step: a multi-line pwsh step fails only on its last command.
+      - name: CLI smoke test (cdm)
+        run: uv run cdm --help
+
+      - name: CLI smoke test (dbt through cdm)
+        run: uv run cdm dbt --version
