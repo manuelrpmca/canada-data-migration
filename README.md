@@ -5,7 +5,11 @@
 
 **I move data to the cloud and prove it arrived intact.** This repository is a small, public version of a real-world data migration, built on Canadian open data.
 
-> **Status: v0.1.** Four public economic series are ingested every day, modelled with dbt and tested on every change, on Linux and Windows. v1.0 adds a "legacy" Oracle source, a BigQuery target and automated reconciliation ([plan](docs/plan.md)).
+> **Status: v0.1.** Four public economic series are ingested every day, modelled with dbt and tested on every change, on Linux and Windows. v1.0 adds a governed "legacy" Oracle source, a BigQuery target and automated reconciliation ([plan](docs/plan.md)).
+
+![Ontario inflation, unemployment and the Bank of Canada policy rate, monthly since 2017](docs/img/indicators.svg)
+
+*Built by this pipeline from the monthly mart with `uv run cdm chart`. Browse the models, tests and lineage in the [dbt docs](https://manuelrpmca.github.io/canada-data-migration/), refreshed by every daily run.*
 
 ## What v0.1 does
 
@@ -49,7 +53,7 @@ uv run cdm dbt source freshness             # is each series as recent as it sho
 uv run cdm sql "SELECT * FROM marts.mart_monthly_indicators ORDER BY month_start DESC LIMIT 12"
 ```
 
-The same commands work in PowerShell on Windows and in a macOS or Linux terminal. The warehouse is a single file, `data/warehouse.duckdb`. Run `uv run cdm --help` for every command, and `uv run cdm dbt docs generate` then `uv run cdm dbt docs serve` for the model documentation.
+The same commands work in PowerShell on Windows and in a macOS or Linux terminal. The warehouse is a single file, `data/warehouse.duckdb`. Run `uv run cdm --help` for every command, `uv run cdm dbt docs generate` then `uv run cdm dbt docs serve` for the model documentation, and `uv run cdm chart` to redraw the chart above.
 
 On a VPN or company network, Statistics Canada may answer `403 Forbidden`; turn the VPN off and run again ([troubleshooting](docs/qa/README.md#troubleshooting-errors-seen-on-windows)).
 
@@ -90,7 +94,7 @@ All decisions: [docs/decisions](docs/decisions/README.md).
 
 ## Next (v1.0)
 
-Oracle Database Free as a bank-style legacy source loaded with PL/SQL, migration to BigQuery and DuckDB, and a reconciliation report (row counts, control totals and fingerprints per partition) published to GitHub Pages. See the [milestone plan](docs/plan.md).
+Oracle Database Free as a legacy system of record, modelled the way regulated organizations (banks, insurers, public sector) keep data: audit trail, effective-dated revisions, data classification and role-based access, loaded with PL/SQL. Then migration to BigQuery and DuckDB, and a reconciliation report (row counts, control totals and fingerprints per partition) published to GitHub Pages. See the [milestone plan](docs/plan.md).
 
 ## Documentation
 

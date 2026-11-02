@@ -12,7 +12,7 @@ v1.0 tells the migration story: a "legacy" relational database is the system of 
 
 Legacy source:
 
-1. **Oracle Database Free in Docker.** Free, runs locally, PL/SQL available; Oracle is a common legacy platform in banking and insurance.
+1. **Oracle Database Free in Docker.** Free, runs locally, PL/SQL available; Oracle is a common legacy platform in banking, insurance and the public sector.
 2. **PostgreSQL.** Lighter and easier in CI, but a weaker "legacy enterprise" story and no PL/SQL.
 
 Reconciliation:
@@ -22,7 +22,7 @@ Reconciliation:
 
 ## Proposed decision
 
-- **Oracle Database Free** in Docker (`docker-compose.yml`), with a bank-style schema (reference tables, a fact table of observations, an audit/run table) and a **PL/SQL package** that loads landed files with `MERGE`, mirroring [ADR 0005](0005-ingestion-pattern.md). Python connects with `python-oracledb` in thin mode (no Oracle client install).
+- **Oracle Database Free** in Docker (`docker-compose.yml`), modelled as a governed system of record, the way regulated organizations (banks, insurers, public sector) keep data: reference tables, a fact table of observations with **effective-dated revisions** (each published value kept with its valid-from and valid-to dates, so "what was known on day X" can be answered), an audit/run table, a **data dictionary with a classification** per table and column, and **separate roles** for loading and for read-only migration and a **PL/SQL package** that loads landed files with `MERGE`, mirroring [ADR 0005](0005-ingestion-pattern.md). Python connects with `python-oracledb` in thin mode (no Oracle client install).
 - **Migration** reads from Oracle and loads BigQuery (load jobs, [ADR 0006](0006-warehouses.md)) and DuckDB.
 - **Reconciliation** written in Python, per source/target pair: counts, control totals, per-partition fingerprints and schema drift, with results stored in a table and rendered as a static HTML report on GitHub Pages on every run.
 - In CI, Oracle runs as a service container only if it fits within the runner's time and memory; otherwise the Oracle path runs locally and in a manual workflow. To be measured in M4, not assumed.
@@ -32,4 +32,5 @@ Open points to settle at M4: the exact Oracle Free image and version, its resour
 ## Consequences
 
 - Shows Oracle, PL/SQL, migration and reconciliation in one place, the core of the owner's experience.
+- The governance features are inspired by practices common in regulated sectors; the project does not claim compliance with any specific regulation or standard (owner decision, 2026-11-02).
 - Oracle in Docker is heavy; the README will state the machine requirements once measured.

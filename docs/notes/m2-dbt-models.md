@@ -1,6 +1,6 @@
 # M2. dbt models
 
-Date closed: open · Owner hours: to be logged
+Date closed: open
 
 ## What was done
 
@@ -65,7 +65,3 @@ Lesson: verification happened only on Linux, and the instructions were written, 
 ## What I would say in an interview
 
 "dbt turns the raw observations into a small star schema: a long fact table with one row per indicator per date, a calendar and an indicator dimension, and one wide monthly table for the dashboard. Every model has tests, including business rules like 'no gaps in monthly series' and 'values in a plausible range'. The demo I like: I corrupt a value, the build fails, and the next ingest repairs it because it re-reads a lookback window."
-
-## What I learned / what surprised me
-
-- To be filled in by Manuel at milestone close.

@@ -7,7 +7,7 @@ Template:
 ```markdown
 # MN. Title
 
-Date closed: YYYY-MM-DD · Owner hours: N
+Date closed: YYYY-MM-DD
 
 ## What was done
 Three to six bullets, with links to the pull requests.
@@ -21,6 +21,4 @@ Only numbers from real runs, with the date and command that produced them.
 ## What I would say in an interview
 Two or three sentences in plain words.
 
-## What I learned / what surprised me
-One or two bullets.
 ```

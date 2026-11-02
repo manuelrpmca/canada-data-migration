@@ -1,6 +1,6 @@
 # M3. Automation and v0.1
 
-Date closed: open · Owner hours: to be logged
+Date closed: 2026-11-02
 
 ## What was done
 
@@ -37,12 +37,10 @@ GitHub Actions on the pull request (PR #10):
 | `daily / run` (live APIs, ubuntu) | First run green in 26 seconds; StatCan reachable from GitHub's runners |
 | `daily / windows-fresh-run` (clean checkout, empty warehouse) | Green: 4 series `success`, PASS=66, freshness 4 of 4 PASS, 0.3 minutes with dependencies in the uv cache |
 
-Owner's QA run on Windows 11: pending.
+Owner's QA run on Windows 11, 2026-11-02 (PowerShell, VPN off): approved. Pending at release time: the first scheduled run on `main` (15:00 UTC the next day).
+
+Found during the QA run: the first command was pasted into an SSH bash session on another computer instead of PowerShell; added to the [troubleshooting table](../qa/README.md#troubleshooting-errors-seen-on-windows).
 
 ## What I would say in an interview
 
 "Every pull request is tested on Linux and on Windows, because that's where I run it, and CI never touches the live APIs, so it's deterministic. A separate daily job runs the real pipeline incrementally, keeps its warehouse between runs, checks freshness per series, and leaves the database as a downloadable artifact. The first CI run caught a bug I would otherwise have found by hand."
-
-## What I learned / what surprised me
-
-- To be filled in by Manuel at milestone close.

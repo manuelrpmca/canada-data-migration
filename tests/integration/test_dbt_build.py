@@ -76,3 +76,15 @@ def test_cdm_dbt_runs_from_a_subfolder(synthetic_warehouse, monkeypatch):
     monkeypatch.delenv("CDM_ROOT", raising=False)
     monkeypatch.chdir(transform.dbt_dir() / "models")
     assert transform.run(synthetic_warehouse, ["compile"])
+
+
+def test_chart_renders_the_three_series(synthetic_warehouse, tmp_path):
+    from cdm import chart
+
+    assert transform.build(synthetic_warehouse)
+    con = warehouse.connect(synthetic_warehouse)
+    svg = chart.write(con, tmp_path / "chart.svg", date(2026, 1, 10)).read_text(encoding="utf-8")
+    con.close()
+    assert svg.startswith("<svg") and svg.count('<circle class="dot') == 3
+    assert "Policy rate" in svg and "Inflation, Ontario" in svg and "Unemployment, Ontario" in svg
+    assert "prefers-color-scheme: dark" in svg

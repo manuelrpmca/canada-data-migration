@@ -30,6 +30,10 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("status", help="rows and date range per series, and the last run")
     p_sql = sub.add_parser("sql", help="run one SQL statement against the warehouse")
     p_sql.add_argument("statement")
+    p_chart = sub.add_parser("chart", help="SVG chart of the monthly mart (for the README)")
+    p_chart.add_argument(
+        "--out", type=Path, default=None, help="output file (default: docs/img/indicators.svg)"
+    )
     sub.add_parser("verify", help="check every series identifier against the live APIs")
     p_find = sub.add_parser("find-vector", help="StatCan: vector ID for a table coordinate")
     p_find.add_argument("product_id", type=int)
@@ -48,6 +52,7 @@ def main(argv: list[str] | None = None) -> int:
         "dbt": lambda: _dbt(db_path, args.dbt_args),
         "status": lambda: _status(db_path),
         "sql": lambda: _sql(db_path, args.statement),
+        "chart": lambda: _chart(db_path, args.out),
         "verify": _verify,
         "find-vector": lambda: _find_vector(args.product_id, args.coordinate),
     }
@@ -147,6 +152,21 @@ def _sql(db_path: Path, statement: str) -> int:
             print("OK")
     finally:
         con.close()
+    return 0
+
+
+def _chart(db_path: Path, out: Path | None) -> int:
+    if _missing_warehouse(db_path):
+        return 1
+    from cdm import chart
+
+    out = out or settings.project_root() / "docs" / "img" / "indicators.svg"
+    con = warehouse.connect(db_path)
+    try:
+        path = chart.write(con, out, datetime.now(UTC).date())
+    finally:
+        con.close()
+    print(f"Chart written to {path}")
     return 0
 
 
