@@ -71,7 +71,7 @@ Planned at the start of Phase 2, after v0.1 is merged and tagged. Indicative onl
 
 | Milestone | Window | Content |
 | --- | --- | --- |
-| M4. Legacy source | Nov 23 - Nov 29 | Oracle Free in Docker as a governed system of record (audit trail, effective-dated revisions, data classification, roles), PL/SQL load package ([ADR 0009](decisions/0009-legacy-source-and-reconciliation.md)) |
+| M4. Legacy source | Nov 23 - Nov 29 (started early, 2026-11-02) | Oracle Free in Docker as a governed system of record (audit trail, effective-dated revisions, data classification, roles), PL/SQL load package ([ADR 0009](decisions/0009-legacy-source-and-reconciliation.md)) |
 | M5. Cloud migration | Nov 30 - Dec 6 | Oracle to BigQuery sandbox and DuckDB; dbt `bigquery` target |
 | M6. Reconciliation | Dec 7 - Dec 13 | Counts, control totals, fingerprints, schema drift; HTML report on GitHub Pages |
 | M7. Presentation and v1.0 | Dec 14 - Dec 20 | Tableau Public dashboard; case study on the owner's website by PR to that repository; tag `v1.0` |
@@ -83,7 +83,7 @@ Planned at the start of Phase 2, after v0.1 is merged and tagged. Indicative onl
 | A series identifier in ADR 0003 is wrong | M1 slips by hours | First task of M1 is to confirm identifiers live |
 | StatCan locks tables before 8:30 a.m. Eastern (HTTP 409) | Failed scheduled run | Schedule after release time; treat 409 as retry-later |
 | Owner hours fall below 16 per week | Dates slip | Re-date the plan in the tracker; scope stays fixed, dates move |
-| Oracle Free is too heavy for CI runners | Oracle path not in CI | Measure in M4; fall back to a manual workflow ([ADR 0009](decisions/0009-legacy-source-and-reconciliation.md)) |
+| Oracle Free is too heavy for CI runners | Oracle path not in CI | Measured in M4: 2.0 GiB, healthy 6 seconds after start on a GitHub runner, whole job 78 seconds; runs in the `oracle` CI job on `ubuntu-latest` ([ADR 0009](decisions/0009-legacy-source-and-reconciliation.md)) |
 | Claude verifies on Linux, the owner runs QA on Windows | QA finds setup and path problems late (seven in the M2 QA run) | Windows job in CI from M3; fresh-clone dry run of every QA script; troubleshooting table in [qa/README.md](qa/README.md) |
 | A VPN or company network blocks a public API (StatCan 403 in M2 QA) | Ingest fails for that source | Turn the VPN off for runs; the daily run in CI does not depend on the owner's network |
 | BigQuery sandbox has no DML and 60-day expiry | Incremental loads impossible there | Replace-style loads, fully rebuildable tables ([ADR 0006](decisions/0006-warehouses.md)) |

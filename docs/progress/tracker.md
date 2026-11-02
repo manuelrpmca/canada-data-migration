@@ -11,7 +11,8 @@ Last updated: 2026-11-02
 | M0. Foundations | In progress (plan merged) | Oct 29 - Nov 4 | 10-14 | | [m0](../notes/m0-foundations.md) |
 | M1. Ingestion | In progress | Nov 2 - Nov 8 | 6-8 | | [m1](../notes/m1-ingestion.md) |
 | M2. dbt models | Merged; QA passed on Windows 11 | Nov 9 - Nov 13 | 6-8 | 2026-11-02 | [m2](../notes/m2-dbt-models.md) |
-| M3. Automation and v0.1 | QA passed on Windows 11; release PR open | Nov 12 - Nov 20 | 5-7 | 2026-11-02 | [m3](../notes/m3-automation-v0.1.md) |
+| M3. Automation and v0.1 | Released (`v0.1`) | Nov 12 - Nov 20 | 5-7 | 2026-11-02 | [m3](../notes/m3-automation-v0.1.md) |
+| M4. Governed Oracle source | PR #12 open; owner QA after merge | Nov 23 - Nov 29 (started 2026-11-02) | | | [m4](../notes/m4-oracle-source.md) |
 
 ## M0 tasks
 
@@ -69,6 +70,20 @@ Last updated: 2026-11-02
 | Release PR: CHANGELOG 0.1.0, version, QA results, release notes | Claude | Done | Release PR |
 | Publish release `v0.1` | Manuel | After the release PR | |
 
+## M4 tasks
+
+| Task | Owner | Status | Link |
+| --- | --- | --- | --- |
+| Measure the Oracle Free image (start time, memory, disk) before building | Claude | Done | PR #12 |
+| `docker-compose.yml`, image pinned by digest; `cdm oracle up` / `down` with passwords in `.env` | Claude | Done | PR #12 |
+| Governed schema: reference, landed files, effective-dated revisions, audit, dictionary and classification | Claude | Done | PR #12 |
+| Accounts: schema-only owner, loader (package only), read-only migration user | Claude | Done | PR #12 |
+| PL/SQL package `cdm_load` (JSON_TABLE parse, close-and-open revisions, out-of-order check, audited failures) | Claude | Done | PR #12 |
+| `cdm oracle load`, `status`, `sql`, `compare`; real-data run, 4 of 4 match | Claude | Done | PR #12 |
+| Integration tests against real Oracle; `oracle` CI job on Linux | Claude | Done | PR #12 |
+| ADR 0009 accepted; M4 QA script with Docker Desktop install; note | Claude | Done | PR #12 |
+| Install Docker Desktop and run the M4 QA script on Windows 11 | Manuel | After merge | [QA M4](../qa/m4-oracle-source.md) |
+
 ## Open questions
 
 | Question | Asked | Answer |
@@ -80,6 +95,8 @@ Last updated: 2026-11-02
 
 | Date | Event |
 | --- | --- |
+| 2026-11-02 | M4 started: Oracle Free measured, governed schema and PL/SQL load built, `oracle` CI job green. PR #12. |
+| 2026-11-02 | `v0.1` released. |
 | 2026-11-02 | Owner's M2 QA on Windows 11: `cdm run` PASS=66 ERROR=0, freshness 4 of 4 PASS, docs generated and served. PRs #6 and #7 merged. |
 | 2026-11-02 | QA scripts made Windows-first after the owner's first Windows run (repo not cloned, uv not on PATH). PR #4 (M2) and PR #5 merged. |
 | 2026-11-01 | M2 dbt models built; `dbt build` PASS=66 on real data. PR opened. |

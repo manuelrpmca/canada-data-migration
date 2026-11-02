@@ -208,8 +208,11 @@ def _oracle(db_path: Path, args: argparse.Namespace) -> int:
         if command == "up":
             filled = oracle.ensure_passwords(oracle.env_file())
             if filled:
-                print(f"Created random passwords in .env (git-ignored): {', '.join(filled)}")
-            print("Starting Oracle. The first time, Docker downloads about 1.3 GB.")
+                print(
+                    f"Created random passwords in .env (git-ignored): {', '.join(filled)}",
+                    flush=True,
+                )
+            print("Starting Oracle. The first time, Docker downloads about 1.3 GB.", flush=True)
             if container.up() != 0:
                 return 1
             return _oracle_setup(oracle.load_settings())

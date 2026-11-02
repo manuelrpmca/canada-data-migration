@@ -33,7 +33,9 @@ flowchart LR
     DDB --> DBT["dbt<br/>staging → marts, tests, freshness"]
     DBT --> MART[("Star schema and<br/>monthly mart")]
     GHA["GitHub Actions<br/>CI on every PR · daily run"] -.-> ING
-    ORA[("Oracle Free<br/>legacy source")] -. v1.0 .-> BQ[("BigQuery")]
+    RAW --> PLSQL["PL/SQL load package<br/>(revisions, audit)"]
+    PLSQL --> ORA[("Oracle Free<br/>governed system of record")]
+    ORA -. v1.0 .-> BQ[("BigQuery")]
     ORA -. v1.0 .-> REC["Reconciliation<br/>report"]
     BQ -. v1.0 .-> REC
 ```
@@ -57,6 +59,20 @@ The same commands work in PowerShell on Windows and in a macOS or Linux terminal
 
 On a VPN or company network, Statistics Canada may answer `403 Forbidden`; turn the VPN off and run again ([troubleshooting](docs/qa/README.md#troubleshooting-errors-seen-on-windows)).
 
+### The Oracle system of record (v1.0, milestone M4)
+
+Needs [Docker Desktop](https://www.docker.com/products/docker-desktop/) running, about 2 GiB of free memory and 7 GB of disk. No Oracle client and no SQL*Plus.
+
+```powershell
+uv run cdm oracle up        # starts Oracle Database Free in Docker, creates passwords in .env, builds the schema
+uv run cdm oracle load      # loads every landed API response through the PL/SQL package
+uv run cdm oracle compare   # rows and totals per series, Oracle against DuckDB
+uv run cdm oracle sql "SELECT * FROM observation_as_of(TIMESTAMP '2026-11-02 18:00:00') FETCH FIRST 5 ROWS ONLY"
+uv run cdm oracle down      # stops it; the data stays in a Docker volume
+```
+
+The schema keeps every value with the dates it was known (`known_from`, `known_to`), every response as received with its hash, an audit row per load, a description and a classification for every column, and three accounts: an owner nobody can sign in as, a loader that can only run the package, and a read-only migration user. Design: [ADR 0009](docs/decisions/0009-legacy-source-and-reconciliation.md).
+
 ## Results from a real run
 
 All numbers below come from real runs on 2026-11-02, with the command that produced them.
@@ -79,6 +95,7 @@ The [daily workflow](https://github.com/manuelrpmca/canada-data-migration/action
 | Ingestion | Raw landing + upsert with a lookback window + run log | Idempotent, auditable, catches revisions ([ADR 0005](docs/decisions/0005-ingestion-pattern.md)) |
 | Warehouse | DuckDB (BigQuery sandbox in v1.0) | Free, a single file, nothing to install or host ([ADR 0006](docs/decisions/0006-warehouses.md)) |
 | Transformation | dbt Core | Tested, documented SQL models ([ADR 0007](docs/decisions/0007-transformation-with-dbt.md)) |
+| Legacy source | Oracle Database Free 23ai in Docker, PL/SQL, python-oracledb (thin) | Governed system of record: revisions, audit, classification, least-privilege accounts ([ADR 0009](docs/decisions/0009-legacy-source-and-reconciliation.md)) |
 | Orchestration and CI | GitHub Actions | No servers, visible history, free for public repositories ([ADR 0008](docs/decisions/0008-orchestration-and-ci.md)) |
 
 All decisions: [docs/decisions](docs/decisions/README.md).
@@ -94,7 +111,7 @@ All decisions: [docs/decisions](docs/decisions/README.md).
 
 ## Next (v1.0)
 
-Oracle Database Free as a legacy system of record, modelled the way regulated organizations (banks, insurers, public sector) keep data: audit trail, effective-dated revisions, data classification and role-based access, loaded with PL/SQL. Then migration to BigQuery and DuckDB, and a reconciliation report (row counts, control totals and fingerprints per partition) published to GitHub Pages. See the [milestone plan](docs/plan.md).
+Done in M4: Oracle Database Free as a legacy system of record, modelled the way regulated organizations (banks, insurers, public sector) keep data: audit trail, effective-dated revisions, data classification and role-based access, loaded with PL/SQL. These features are inspired by common practice; the project claims no compliance with any regulation. Next: migration to BigQuery and DuckDB, and a reconciliation report (row counts, control totals and fingerprints per partition) published to GitHub Pages. See the [milestone plan](docs/plan.md).
 
 ## Documentation
 
