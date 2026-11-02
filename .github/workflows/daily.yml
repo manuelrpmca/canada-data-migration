@@ -1,0 +1,113 @@
+# Daily run against the live APIs (ADR 0008): ingest, dbt build, source freshness.
+# Scheduled after Statistics Canada's 8:30 a.m. Eastern release. The warehouse is kept between
+# runs in the Actions cache, so each run is incremental (lookback window, ADR 0005); when the
+# cache is empty or evicted, the run backfills from start_date. The DuckDB file, raw landing
+# files and logs are uploaded as an artifact.
+name: daily
+
+on:
+  schedule:
+    - cron: "0 15 * * *"  # 15:00 UTC = 10:00 or 11:00 Eastern
+  workflow_dispatch:
+  pull_request:  # test changes to this workflow before they reach main
+    paths:
+      - .github/workflows/daily.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CDM_DATA_DIR: ${{ github.workspace }}/data
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
+        with:
+          enable-cache: true
+
+      - name: Install (locked)
+        run: uv sync --locked
+
+      - name: Restore the warehouse from the last run
+        id: restore
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
+        with:
+          path: data/warehouse.duckdb
+          key: warehouse-v1-${{ github.run_id }}
+          restore-keys: warehouse-v1-  # bump v1 when the raw schema changes
+
+      - name: Ingest and dbt build
+        run: uv run cdm run
+
+      - name: Source freshness
+        run: uv run cdm dbt source freshness
+
+      - name: Summary
+        if: always()
+        env:
+          RESTORED: ${{ steps.restore.outputs.cache-matched-key || 'no (full backfill)' }}
+        run: |
+          {
+            echo "## Daily run"
+            echo
+            echo "Warehouse restored from cache: $RESTORED"
+            echo
+            echo '```'
+            uv run cdm status
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Save the warehouse for the next run
+        if: success() && github.event_name != 'pull_request'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
+        with:
+          path: data/warehouse.duckdb
+          key: warehouse-v1-${{ github.run_id }}
+
+      - name: Upload warehouse, landing files and logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: daily-${{ github.run_id }}
+          path: |
+            data/
+            dbt/logs/
+            dbt/target/run_results.json
+            dbt/target/sources.json
+          retention-days: 30
+          if-no-files-found: warn
+
+  # The QA script's "fresh machine" test on the owner's platform: a clean checkout on Windows,
+  # empty warehouse, one command. Runs when the workflow is changed or started by hand, not daily.
+  windows-fresh-run:
+    if: github.event_name != 'schedule'
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
+
+      - name: The one command, timed
+        run: |
+          $elapsed = Measure-Command { uv run cdm run | Out-Default }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "Fresh run on windows-latest: {0:N1} minutes" -f $elapsed.TotalMinutes | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
+
+      - name: Source freshness
+        run: uv run cdm dbt source freshness

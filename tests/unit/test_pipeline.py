@@ -6,7 +6,7 @@ import httpx
 import pytest
 
 from cdm import pipeline
-from cdm.http import make_client
+from cdm.http import RetryError, make_client
 from cdm.load import duckdb as warehouse
 
 
@@ -90,3 +90,25 @@ def test_landed_file_is_byte_identical_to_response(
     landed = next((tmp_path / "raw" / "valet" / "usd_cad").glob("*.json"))
     assert landed.read_bytes() == fixture_bytes("valet_observations.json")
     assert json.loads(landed.read_bytes())["observations"]
+
+
+def _http_error(status: int) -> httpx.HTTPStatusError:
+    request = httpx.Request("GET", "https://www150.statcan.gc.ca/t1/wds/rest/x")
+    response = httpx.Response(status, request=request)
+    return httpx.HTTPStatusError(f"Client error '{status}'\nFor more information", request=request,
+                                 response=response)  # fmt: skip
+
+
+def test_describe_error_points_to_the_vpn_on_403():
+    message = pipeline.describe_error(_http_error(403))
+    assert "VPN" in message and "\n" not in message
+
+
+def test_describe_error_names_a_connection_problem():
+    exc = RetryError("GET https://x failed after 5 attempts (ConnectError: [Errno -2] DNS)")
+    assert "internet connection" in pipeline.describe_error(exc)
+
+
+def test_describe_error_adds_no_hint_to_other_errors():
+    message = pipeline.describe_error(_http_error(404))
+    assert message == "HTTPStatusError: Client error '404'"
