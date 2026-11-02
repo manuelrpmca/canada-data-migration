@@ -4,16 +4,24 @@ Run on your machine after the M1 pull request is merged. About 15 minutes. Comma
 
 ## One-time setup
 
-Install [uv](https://docs.astral.sh/uv/getting-started/installation/) (it also installs Python 3.12 for this project), then open a new PowerShell window:
+Skip what you already have. Commands are for PowerShell; open a **new** PowerShell window after installing uv, so it finds the `uv` command.
 
 ```powershell
+# 1. Install uv (it also installs Python 3.12 for this project); then open a new PowerShell window
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+uv --version
+
+# 2. Clone the repository into your home folder (needs Git for Windows: https://git-scm.com/download/win)
+cd $HOME
+git clone https://github.com/manuelrpmca/canada-data-migration.git
 ```
+
+The script below starts with `cd $HOME\canada-data-migration`. If you cloned the repository somewhere else, `cd` into that folder instead.
 
 ## Script
 
 ```powershell
-cd canada-data-migration
+cd $HOME\canada-data-migration
 git switch main
 git pull
 uv sync                  # 1. installs the locked environment
