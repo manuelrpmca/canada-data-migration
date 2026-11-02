@@ -23,6 +23,10 @@ def main(argv: list[str] | None = None) -> int:
     p_ingest.add_argument("--series", action="append", help="series key (repeatable); default all")
     p_run = sub.add_parser("run", help="ingest, then dbt build (the full pipeline)")
     p_run.add_argument("--skip-ingest", action="store_true", help="only run dbt build")
+    p_dbt = sub.add_parser(
+        "dbt", help="run any dbt command from any folder, e.g. cdm dbt docs serve"
+    )
+    p_dbt.add_argument("dbt_args", nargs=argparse.REMAINDER, help="dbt arguments")
     sub.add_parser("status", help="rows and date range per series, and the last run")
     p_sql = sub.add_parser("sql", help="run one SQL statement against the warehouse")
     p_sql.add_argument("statement")
@@ -38,6 +42,7 @@ def main(argv: list[str] | None = None) -> int:
     commands = {
         "ingest": lambda: _ingest(db_path, args.series),
         "run": lambda: _run(db_path, args.skip_ingest),
+        "dbt": lambda: 0 if transform.run(db_path, args.dbt_args) else 1,
         "status": lambda: _status(db_path),
         "sql": lambda: _sql(db_path, args.statement),
         "verify": _verify,

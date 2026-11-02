@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `cdm dbt <command>` runs any dbt command on the project and warehouse from any folder (for example `uv run cdm dbt docs serve`); QA scripts no longer `cd dbt`.
 - M2 dbt models: dbt Core project in `dbt/` on DuckDB with per-series source freshness, staging views, star schema (`dim_date`, `dim_indicator`, `fct_observation`) and `mart_monthly_indicators`, 57 data tests and a unit test, and a `source_publishers` seed with attribution text.
 - `cdm run` (ingest + `dbt build`) and `cdm sql` (one statement, for QA). `cdm ingest` writes `raw.series` from `config/series.yml`.
 - Offline integration test that runs `dbt build` on a synthetic warehouse.

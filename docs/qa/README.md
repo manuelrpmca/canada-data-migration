@@ -8,7 +8,7 @@ Anyone writing or changing a QA script follows these rules, so a script runs top
 
 1. **PowerShell syntax only** in code blocks (```` ```powershell ````). No bash-only commands (`cp`, `rm -rf`, `export`, `&&` chains, `source`), no `make`. Use `Copy-Item`, `Remove-Item`, `$env:NAME = "value"`.
 2. **Self-contained.** A script that runs commands starts with the "One-time setup" section below, copied as is, so it works on a machine that has never run the project.
-3. **Absolute starting folder.** The first command is `cd $HOME\canada-data-migration`, never a relative `cd`, so it works from any folder PowerShell opens in.
+3. **One folder for the whole script.** The first command is `cd $HOME\canada-data-migration`, and no later command changes folder. dbt runs through `uv run cdm dbt <command>`, never `cd dbt` + `uv run dbt`.
 4. **One command per line,** with the expected result in a `#` comment. Comments can be pasted with the command.
 5. **Quoting:** SQL passed to `cdm sql` goes in double quotes, with single quotes inside for strings.
 6. **New tools** need an install line and a check line (for example `uv --version`), and the PATH line if the installer adds a folder to PATH.
@@ -40,3 +40,4 @@ If the repository is already cloned, skip step 3. If it is cloned somewhere othe
 | The uv installer is blocked (execution policy or company policy) | PowerShell scripts are restricted | `winget install --id=astral-sh.uv -e`, then open a new PowerShell window |
 | `403 Forbidden` from `www150.statcan.gc.ca` in `cdm ingest` or `cdm run` (Bank of Canada works) | Statistics Canada blocks requests from some VPN exit addresses; seen 2026-11-02 with a VPN on, gone with it off | Turn the VPN off and run `uv run cdm run` again. To check: open https://www150.statcan.gc.ca/t1/wds/rest/getCodeSets in the browser; JSON means the network is fine |
 | `FileNotFoundError: ...\dbt\config\series.yml` from `uv run cdm ...` | `cdm` was run inside `dbt\`; before 2026-11-02 it only looked for `config\` in the current folder | Fixed: `cdm` now finds the repository root from any subfolder. On an older checkout, `cd $HOME\canada-data-migration` first |
+| `Error: Invalid value for '--profiles-dir': Path 'C:\Users\<you>\.dbt' does not exist` | `uv run dbt ...` was run outside the `dbt\` folder, so dbt looked for its profile in the home folder | Use `uv run cdm dbt ...` from the repository folder (added 2026-11-02); it works from any folder |
