@@ -38,3 +38,4 @@ If the repository is already cloned, skip step 3. If it is cloned somewhere othe
 | `fatal: not a git repository` | PowerShell is not inside the repository folder | `cd $HOME\canada-data-migration` |
 | `uv : The term 'uv' is not recognized` | uv is not installed, or was installed in this window and PATH is stale | Run steps 1 and 2 of the setup, then `uv --version` |
 | The uv installer is blocked (execution policy or company policy) | PowerShell scripts are restricted | `winget install --id=astral-sh.uv -e`, then open a new PowerShell window |
+| `403 Forbidden` from `www150.statcan.gc.ca` in `cdm ingest` or `cdm run` (Bank of Canada works) | Statistics Canada blocks requests from some VPN exit addresses; seen 2026-11-02 with a VPN on, gone with it off | Turn the VPN off and run `uv run cdm run` again. To check: open https://www150.statcan.gc.ca/t1/wds/rest/getCodeSets in the browser; JSON means the network is fine |
