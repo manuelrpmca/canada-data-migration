@@ -17,6 +17,7 @@ Public portfolio project: ingest Canadian open data, load a "legacy" Oracle sour
 7. **English** for everything in the repository: code, comments, commits, PRs, docs.
 8. **Attribution** for Statistics Canada and the Bank of Canada on every published output (see README).
 9. **Explainable.** Every milestone closes with a note and a QA run on the owner's machine.
+10. **QA scripts are Windows-first.** The owner runs them in PowerShell on Windows 11. Follow the rules in [docs/qa/README.md](docs/qa/README.md): PowerShell syntax only, the one-time setup in every script, `cd $HOME\canada-data-migration` as the first and only `cd`, dbt via `uv run cdm dbt ...`, and every new error added to its troubleshooting table.
 
 ## Conventions
 
@@ -34,7 +35,7 @@ Public portfolio project: ingest Canadian open data, load a "legacy" Oracle sour
 - Series identifiers verified against the live APIs on 2026-10-30 (see the [M1 note](docs/notes/m1-ingestion.md)). StatCan vectors: CPI Ontario 41691919, unemployment rate Ontario 2063949.
 - Test fixtures are trimmed responses recorded on 2026-10-30; edge cases (empty or null values) use inline synthetic payloads in the tests.
 - WDS coordinates need all 10 positions; `cdm find-vector` pads them.
-- dbt project in `dbt/`; run with `uv run cdm run` or `cd dbt; uv run dbt build`. Schemas in the DuckDB file: `raw` (ingest), `staging`, `marts`, `reference` (seeds).
+- dbt project in `dbt/`; run with `uv run cdm run` or `uv run cdm dbt <command>` from any folder. Schemas in the DuckDB file: `raw` (ingest), `staging`, `marts`, `reference` (seeds).
 - Business days are inferred from USD/CAD publication days (the policy rate has values on holidays). Adapter-specific SQL goes in macros (`date_spine`).
 
 ## Key facts checked (2026-10-29)

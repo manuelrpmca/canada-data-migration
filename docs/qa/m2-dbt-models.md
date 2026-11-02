@@ -4,14 +4,16 @@ Run on your machine after the M2 pull request is merged. About 15 minutes. Comma
 
 ## One-time setup
 
-Skip what you already have. Commands are for PowerShell; open a **new** PowerShell window after installing uv, so it finds the `uv` command.
+Skip what you already have. See [Troubleshooting](README.md#troubleshooting-errors-seen-on-windows) if a command is not recognized.
 
 ```powershell
-# 1. Install uv (it also installs Python 3.12 for this project); then open a new PowerShell window
+# 1. Install uv (it also installs Python 3.12 for this project)
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-uv --version
+# 2. Let this window find uv without reopening it
+$env:Path = "$env:USERPROFILE\.local\bin;$env:Path"
+uv --version                 # expected: a version number
 
-# 2. Clone the repository into your home folder (needs Git for Windows: https://git-scm.com/download/win)
+# 3. Clone the repository into your home folder (needs Git for Windows: https://git-scm.com/download/win)
 cd $HOME
 git clone https://github.com/manuelrpmca/canada-data-migration.git
 ```
@@ -28,13 +30,13 @@ git switch main
 git pull
 uv sync                        # 1. installs dbt-core and dbt-duckdb from the lock file
 uv run pytest                  # 2. expected: all tests pass, including the offline dbt build
-uv run cdm run                 # 3. ingest + dbt build. Expected last line: "Done. PASS=66 WARN=0 ERROR=0 ..."
-cd dbt
-uv run dbt source freshness    # 4. expected: PASS for the four series (WARN only with a clear reason)
-uv run dbt docs generate       # 5. builds the docs site into dbt\target
-uv run dbt docs serve          # 6. opens the docs in the browser; Ctrl+C to stop
-cd ..
+uv run cdm run                 # 3. ingest + dbt build. Expected: success for the 4 series, then "Done. PASS=66 WARN=0 ERROR=0 ..."
+uv run cdm dbt source freshness  # 4. expected: PASS for the four series (WARN only with a clear reason)
+uv run cdm dbt docs generate     # 5. builds the docs site into dbt\target
+uv run cdm dbt docs serve        # 6. opens the docs in the browser; Ctrl+C to stop
 ```
+
+Every command runs from the repository folder; there is no `cd dbt`. `uv run cdm dbt <command>` runs any dbt command on this project and warehouse. Turn any VPN off first: Statistics Canada can answer 403 through one (see [Troubleshooting](README.md#troubleshooting-errors-seen-on-windows)).
 
 Look at the mart:
 

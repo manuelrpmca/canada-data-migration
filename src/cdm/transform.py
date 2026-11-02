@@ -19,11 +19,20 @@ def dbt_dir() -> Path:
 
 def build(db_path: Path, args: list[str] | None = None) -> bool:
     """`dbt build` (models, seeds, tests). Returns True when every node passed."""
+    return run(db_path, ["build", *(args or [])])
+
+
+def run(db_path: Path, args: list[str]) -> bool:
+    """Any dbt command (for example ["source", "freshness"]) on this project and warehouse,
+    whatever the current folder. Returns True when dbt reports success."""
     from dbt.cli.main import dbtRunner  # imported here: dbt is slow to import
 
+    if not args:
+        args = ["--help"]
     os.environ["CDM_DUCKDB_PATH"] = str(db_path.resolve())
     project = str(dbt_dir())
-    result = dbtRunner().invoke(
-        ["build", "--project-dir", project, "--profiles-dir", project, *(args or [])]
-    )
+    if args[0] in ("--help", "-h", "--version"):
+        result = dbtRunner().invoke(args)
+    else:
+        result = dbtRunner().invoke([*args, "--project-dir", project, "--profiles-dir", project])
     return bool(result.success)

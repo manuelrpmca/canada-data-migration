@@ -2,7 +2,7 @@
 
 Live status of every milestone task. Updated in each pull request. Hours are the owner's actual hours, logged at milestone close; estimates live in the [plan](../plan.md).
 
-Last updated: 2026-11-01
+Last updated: 2026-11-02
 
 ## Milestones
 
@@ -63,6 +63,7 @@ Last updated: 2026-11-01
 
 | Date | Event |
 | --- | --- |
+| 2026-11-02 | QA scripts made Windows-first after the owner's first Windows run (repo not cloned, uv not on PATH). PR #4 (M2) and PR #5 merged. |
 | 2026-11-01 | M2 dbt models built; `dbt build` PASS=66 on real data. PR opened. |
 | 2026-10-30 | PR #3 merged: live ID verification and first real ingest. |
 | 2026-10-30 | Series identifiers verified live; StatCan vectors 41691919 and 2063949 set; first real ingest recorded in the M1 note. |

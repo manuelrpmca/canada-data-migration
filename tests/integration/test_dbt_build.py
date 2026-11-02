@@ -70,3 +70,9 @@ def test_dbt_build_fails_on_an_implausible_value(synthetic_warehouse):
     con.execute("UPDATE raw.observations SET value = 99 WHERE series_key = 'policy_rate'")
     con.close()
     assert not transform.build(synthetic_warehouse)
+
+
+def test_cdm_dbt_runs_from_a_subfolder(synthetic_warehouse, monkeypatch):
+    monkeypatch.delenv("CDM_ROOT", raising=False)
+    monkeypatch.chdir(transform.dbt_dir() / "models")
+    assert transform.run(synthetic_warehouse, ["compile"])

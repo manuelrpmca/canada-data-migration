@@ -11,12 +11,14 @@ Run after the M0 pull request is merged. About 20 minutes. Tick each box; anythi
 - [ ] Settings > Rules (or Branches): `main` requires a pull request before merging.
 - [ ] Clone fresh and confirm secrets cannot be committed by accident:
 
-  ```bash
-  git clone https://github.com/manuelrpmca/canada-data-migration.git
-  cd canada-data-migration
-  cp .env.example .env
+  ```powershell
+  cd $HOME\canada-data-migration
+  Copy-Item .env.example .env
   git status --short   # expected: no output (.env is ignored)
+  Remove-Item .env
   ```
+
+  If the repository is not cloned yet, follow the one-time setup in the [M1 QA script](m1-ingestion.md#one-time-setup) first.
 
 ## Understanding (interview check)
 
