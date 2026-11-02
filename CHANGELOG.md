@@ -12,6 +12,8 @@ Planned as `0.1.0`; the version and date are set in the release pull request aft
 - Daily run (`.github/workflows/daily.yml`) at 15:00 UTC and on demand: `cdm run` against the live APIs, source freshness, a summary table, and the warehouse, landing files and dbt logs as an artifact. The warehouse is kept in the Actions cache so runs are incremental. Changes to the workflow are tested on the pull request, including a clean-checkout run on Windows.
 - README for v0.1: CI and daily badges, architecture, one-command run, results from real runs, decisions, limits and next steps.
 - QA script for M3 and the M3 note.
+- `cdm chart` draws the monthly mart (policy rate, Ontario inflation, Ontario unemployment) as an SVG with light and dark colours; the README shows it.
+- The daily run on `main` publishes the dbt docs (models, tests, lineage) and the chart to GitHub Pages.
 
 - `cdm dbt <command>` runs any dbt command on the project and warehouse from any folder (for example `uv run cdm dbt docs serve`); QA scripts no longer `cd dbt`.
 - M2 dbt models: dbt Core project in `dbt/` on DuckDB with per-series source freshness, staging views, star schema (`dim_date`, `dim_indicator`, `fct_observation`) and `mart_monthly_indicators`, 57 data tests and a unit test, and a `source_publishers` seed with attribution text.
@@ -23,6 +25,9 @@ Planned as `0.1.0`; the version and date are set in the release pull request aft
 - Series identifiers verified against the live APIs; StatCan vector IDs set (CPI Ontario 41691919, unemployment rate Ontario 2063949). First real ingest results in the M1 note.
 
 ### Changed
+
+- v1.0 framing: the Oracle legacy source is a governed system of record in the style of regulated organizations (banks, insurers, public sector) instead of "bank-style" (README, ADR 0002, ADR 0009, plan).
+- Milestone notes and the tracker no longer ask for owner hours or a "what I learned" line.
 
 - Failed series explain the likely cause in one line: HTTP 403 points to a VPN or company network, a connection error to the network or proxy.
 - A missing warehouse is reported with the command that creates it (`uv run cdm run`), and `cdm dbt` no longer creates an empty warehouse file.

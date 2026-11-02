@@ -1,6 +1,6 @@
 # Milestone plan
 
-Plan for Phase 0 (foundations) and Phase 1 (release v0.1), with a sketch of Phase 2 (release v1.0). Dates assume **16-20 hours per week** from the owner. Hour figures are **planning estimates**, not measurements; actual hours are logged in the [tracker](progress/tracker.md) and the plan is re-dated if they drift.
+Plan for Phase 0 (foundations) and Phase 1 (release v0.1), with a sketch of Phase 2 (release v1.0). Dates assume **16-20 hours per week** from the owner. Hour figures are **planning estimates**, not measurements; the plan is re-dated if progress drifts.
 
 ## How every milestone works
 
@@ -71,7 +71,7 @@ Planned at the start of Phase 2, after v0.1 is merged and tagged. Indicative onl
 
 | Milestone | Window | Content |
 | --- | --- | --- |
-| M4. Legacy source | Nov 23 - Nov 29 | Oracle Free in Docker, bank-style schema, PL/SQL load package ([ADR 0009](decisions/0009-legacy-source-and-reconciliation.md)) |
+| M4. Legacy source | Nov 23 - Nov 29 | Oracle Free in Docker as a governed system of record (audit trail, effective-dated revisions, data classification, roles), PL/SQL load package ([ADR 0009](decisions/0009-legacy-source-and-reconciliation.md)) |
 | M5. Cloud migration | Nov 30 - Dec 6 | Oracle to BigQuery sandbox and DuckDB; dbt `bigquery` target |
 | M6. Reconciliation | Dec 7 - Dec 13 | Counts, control totals, fingerprints, schema drift; HTML report on GitHub Pages |
 | M7. Presentation and v1.0 | Dec 14 - Dec 20 | Tableau Public dashboard; case study on the owner's website by PR to that repository; tag `v1.0` |

@@ -42,5 +42,4 @@ Ask someone who has not seen the project to read the README for 60 seconds, then
 
 - [ ] Every number in the README comes from a real run (dates and commands are in the table).
 - [ ] The README status line says v0.1, not "Work in progress".
-- [ ] Write your hours and one line of what you learned in the [M3 note](../notes/m3-automation-v0.1.md) (or send them in the chat).
 - [ ] Say "OK v0.1" in the chat. Claude then opens the release pull request (CHANGELOG `0.1.0` dated that day, version 0.1.0, your QA results) with the release notes in it. After you merge it, you publish the release yourself: **Releases > Draft a new release**, tag `v0.1` on `main`, paste the notes, **Publish**. Publishing is the public step, so it stays in your hands.

@@ -2,7 +2,8 @@
 # Scheduled after Statistics Canada's 8:30 a.m. Eastern release. The warehouse is kept between
 # runs in the Actions cache, so each run is incremental (lookback window, ADR 0005); when the
 # cache is empty or evicted, the run backfills from start_date. The DuckDB file, raw landing
-# files and logs are uploaded as an artifact.
+# files and logs are uploaded as an artifact. On main, the dbt docs and the chart are published
+# to GitHub Pages.
 name: daily
 
 on:
@@ -74,6 +75,19 @@ jobs:
           path: data/warehouse.duckdb
           key: warehouse-v1-${{ github.run_id }}
 
+      - name: Build the site (dbt docs and chart)
+        if: success()
+        run: |
+          uv run cdm dbt docs generate --static
+          uv run cdm chart --out site/indicators.svg
+          cp dbt/target/static_index.html site/index.html
+
+      - name: Upload the site for GitHub Pages
+        if: success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
+        with:
+          path: site/
+
       - name: Upload warehouse, landing files and logs
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
@@ -86,6 +100,23 @@ jobs:
             dbt/target/sources.json
           retention-days: 30
           if-no-files-found: warn
+
+  # Publishes the dbt docs (lineage, tests, columns) and the chart, refreshed by every run on
+  # main. Needs Settings > Pages > Source: GitHub Actions. Only this job can write to Pages.
+  pages:
+    needs: run
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346  # v5.0.1
 
   # The QA script's "fresh machine" test on the owner's platform: a clean checkout on Windows,
   # empty warehouse, one command. Runs when the workflow is changed or started by hand, not daily.

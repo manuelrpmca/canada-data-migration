@@ -1,6 +1,6 @@
 # M0. Foundations
 
-Date closed: open · Owner hours: to be logged
+Date closed: open
 
 ## What was done
 
@@ -22,7 +22,3 @@ None yet. No numbers are published until a real run produces them.
 ## What I would say in an interview
 
 "Before writing code I wrote down the scope and every tool choice as short decision records, including what I chose not to use and why. For example, I kept Airflow out because a daily batch of a few API calls does not need a scheduler server; GitHub Actions gives me CI and a schedule with nothing to operate."
-
-## What I learned / what surprised me
-
-- To be filled in by Manuel at milestone close.

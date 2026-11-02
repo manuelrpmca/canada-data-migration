@@ -1,6 +1,6 @@
 # M1. Ingestion
 
-Date closed: open · Owner hours: to be logged
+Date closed: open
 
 ## What was done
 
@@ -49,7 +49,3 @@ Observed, to handle in M2: `policy_rate` has 101 dates that `usd_cad` does not (
 ## What I would say in an interview
 
 "The ingestion is incremental and idempotent. Each run re-reads a short window before the last loaded date, so statistical revisions are picked up. It saves the raw response before parsing, so any load can be replayed. Then it merges on a natural key and logs inserted, updated and unchanged counts per series. Running it twice changes nothing, and a test proves it."
-
-## What I learned / what surprised me
-
-- To be filled in by Manuel at milestone close.

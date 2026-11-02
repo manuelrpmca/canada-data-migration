@@ -20,7 +20,7 @@ Option 2.
 
 **v0.1 (Phase 1): local pipeline.** Ingest a small set of Bank of Canada and Statistics Canada series ([ADR 0003](0003-data-sources.md)) incrementally and idempotently, load them into DuckDB, model them with dbt (staging, marts, tests, freshness), run CI on every pull request and a daily scheduled run, and document it in a README with a diagram and a one-command run.
 
-**v1.0 (Phase 2): migration and proof.** Add Oracle Database Free as the "legacy" source with a bank-style schema and a PL/SQL load package, migrate to BigQuery (sandbox) and DuckDB, reconcile source and targets (row counts, control totals, per-partition fingerprints, schema drift) with an HTML report on GitHub Pages, and publish a Tableau Public dashboard.
+**v1.0 (Phase 2): migration and proof.** Add Oracle Database Free as the "legacy" source, modelled as a governed system of record in the style of regulated organizations (banks, insurers, public sector; amended 2026-11-02, see [ADR 0009](0009-legacy-source-and-reconciliation.md)), with a PL/SQL load package, migrate to BigQuery (sandbox) and DuckDB, reconcile source and targets (row counts, control totals, per-partition fingerprints, schema drift) with an HTML report on GitHub Pages, and publish a Tableau Public dashboard.
 
 **Non-goals** (explicitly out of scope for v1.0):
 

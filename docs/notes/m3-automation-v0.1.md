@@ -1,6 +1,6 @@
 # M3. Automation and v0.1
 
-Date closed: open · Owner hours: to be logged
+Date closed: open
 
 ## What was done
 
@@ -42,7 +42,3 @@ Owner's QA run on Windows 11: pending.
 ## What I would say in an interview
 
 "Every pull request is tested on Linux and on Windows, because that's where I run it, and CI never touches the live APIs, so it's deterministic. A separate daily job runs the real pipeline incrementally, keeps its warehouse between runs, checks freshness per series, and leaves the database as a downloadable artifact. The first CI run caught a bug I would otherwise have found by hand."
-
-## What I learned / what surprised me
-
-- To be filled in by Manuel at milestone close.

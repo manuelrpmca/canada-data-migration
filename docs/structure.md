@@ -26,7 +26,7 @@ canada-data-migration/
 │   ├── tests/                # Singular data tests
 │   └── profiles.yml          # Targets: duckdb (local, CI), bigquery [M5]; no secrets
 ├── oracle/                   # Legacy source                                         [M4]
-│   ├── ddl/                  # Bank-style schema
+│   ├── ddl/                  # Governed schema: audit, effective-dated revisions, classification, roles
 │   └── plsql/                # Load package (spec and body)
 ├── docker-compose.yml        # Oracle Database Free container                        [M4]
 ├── tests/                    # pytest                                                [M1]
