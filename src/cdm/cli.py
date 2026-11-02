@@ -37,7 +37,10 @@ def main(argv: list[str] | None = None) -> int:
         "coordinate", help='member IDs per dimension, e.g. "14.2" (padded to 10 positions)'
     )
 
+    argv, dbt_args = _split_dbt_args(sys.argv[1:] if argv is None else list(argv))
     args = parser.parse_args(argv)
+    if args.command == "dbt":
+        args.dbt_args = dbt_args
     db_path = args.db or settings.default_db_path()
     commands = {
         "ingest": lambda: _ingest(db_path, args.series),
@@ -49,6 +52,23 @@ def main(argv: list[str] | None = None) -> int:
         "find-vector": lambda: _find_vector(args.product_id, args.coordinate),
     }
     return commands[args.command]()
+
+
+def _split_dbt_args(argv: list[str]) -> tuple[list[str], list[str]]:
+    """Everything after the `dbt` command goes to dbt untouched. argparse alone would reject
+    options such as `cdm dbt --version`, because REMAINDER does not start with an option."""
+    i = 0
+    while i < len(argv):
+        token = argv[i]
+        if token == "--db":
+            i += 2
+        elif token.startswith("--db="):
+            i += 1
+        elif token == "dbt":
+            return argv[: i + 1], argv[i + 1 :]
+        else:
+            break
+    return argv, []
 
 
 def _ingest(db_path: Path, only: list[str] | None) -> int:

@@ -49,7 +49,9 @@ jobs:
       - name: Tests, including dbt build on a synthetic warehouse
         run: uv run pytest
 
-      - name: CLI smoke test
-        run: |
-          uv run cdm --help
-          uv run cdm dbt --version
+      # One command per step: a multi-line pwsh step fails only on its last command.
+      - name: CLI smoke test (cdm)
+        run: uv run cdm --help
+
+      - name: CLI smoke test (dbt through cdm)
+        run: uv run cdm dbt --version
