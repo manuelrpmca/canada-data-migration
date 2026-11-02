@@ -11,16 +11,17 @@ Run after the M3 pull requests are merged and before approving the `v0.1` tag. A
 
 ## Fresh-machine test (the "one command" promise)
 
-In a new folder, ideally on a second machine or a fresh user account:
+In a new folder, ideally on a second machine or a fresh user account. If uv is not installed there, run steps 1 and 2 of the [one-time setup](README.md#one-time-setup-copy-into-each-script) first.
 
-```bash
-git clone https://github.com/manuelrpmca/canada-data-migration.git
-cd canada-data-migration
-uv run cdm run      # the one command from the README; expected: completes with all tests passing
+```powershell
+cd $HOME
+git clone https://github.com/manuelrpmca/canada-data-migration.git cdm-fresh
+cd $HOME\cdm-fresh
+Measure-Command { uv run cdm run | Out-Default }   # the one command from the README; expected: all tests pass, then the duration
 ```
 
 - [ ] It works with no steps other than installing uv.
-- [ ] Time it and write the real duration in the M3 note (it may go in the README).
+- [ ] Write the real duration (`TotalMinutes` above) in the M3 note (it may go in the README).
 
 ## README (60-second test)
 

@@ -17,6 +17,7 @@ Public portfolio project: ingest Canadian open data, load a "legacy" Oracle sour
 7. **English** for everything in the repository: code, comments, commits, PRs, docs.
 8. **Attribution** for Statistics Canada and the Bank of Canada on every published output (see README).
 9. **Explainable.** Every milestone closes with a note and a QA run on the owner's machine.
+10. **QA scripts are Windows-first.** The owner runs them in PowerShell on Windows 11. Follow the rules in [docs/qa/README.md](docs/qa/README.md): PowerShell syntax only, the one-time setup in every script, `cd $HOME\canada-data-migration` as the first command, and every new error added to its troubleshooting table.
 
 ## Conventions
 

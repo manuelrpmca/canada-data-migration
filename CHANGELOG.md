@@ -16,6 +16,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- QA scripts are Windows-first: rules and troubleshooting in `docs/qa/README.md`; every script has a one-time setup (uv install, PATH for the current window, clone) and starts with `cd $HOME\canada-data-migration`; M0 and M3 snippets moved from bash to PowerShell.
 - Test fixtures are now trimmed responses recorded from the live APIs, not hand-written.
 
 ### Fixed
