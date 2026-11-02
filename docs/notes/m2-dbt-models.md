@@ -48,6 +48,20 @@ Found during the run and fixed: Statistics Canada answers 403 through the owner'
 
 Plausible-range bounds in the singular test are sanity limits, not published thresholds. The loaded data stays well inside them: USD/CAD 1.204 to 1.4603, policy rate 0.25 to 5.0, Ontario CPI 130.8 to 170.3, Ontario unemployment rate 5.0 to 14.2.
 
+## QA retrospective (2026-11-02)
+
+The models passed on the first real run, but the owner's QA run hit seven problems in about 30 minutes. None was a defect in the models; all were in setup, environment or instructions.
+
+| Problem | Root cause | Prevention now in place |
+| --- | --- | --- |
+| Repository not cloned; `uv` not installed | QA script assumed the M1 setup was done | One-time setup block in every script ([qa/README.md](../qa/README.md)) |
+| `uv` not found right after install | Installer updates PATH only for new windows | PATH line in the setup block |
+| StatCan HTTP 403 | Owner's VPN; never tested off Claude's network | VPN warning in the script; troubleshooting row; clearer error planned for M3 |
+| `cdm` failed inside `dbt\`; `dbt` failed outside it | Commands depended on the current folder | `cdm` finds the repository root; `cdm dbt` runs dbt from anywhere |
+| `cdm dbt` "invalid choice" | Guide changed and merged during the run; chat mixed old and new commands | Handoff protocol: no changes during QA, one follow-up PR after |
+
+Lesson: verification happened only on Linux, and the instructions were written, not executed. From M3, every QA script is run from a fresh clone before handoff, and CI also runs on Windows ([MEMORY.md](../../MEMORY.md), "Working agreement").
+
 ## What I would say in an interview
 
 "dbt turns the raw observations into a small star schema: a long fact table with one row per indicator per date, a calendar and an indicator dimension, and one wide monthly table for the dashboard. Every model has tests, including business rules like 'no gaps in monthly series' and 'values in a plausible range'. The demo I like: I corrupt a value, the build fails, and the next ingest repairs it because it re-reads a lookback window."
