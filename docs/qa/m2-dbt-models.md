@@ -1,21 +1,43 @@
 # QA script: M2 dbt models
 
-Run on your machine after the M2 pull requests are merged. About 15 minutes.
+Run on your machine after the M2 pull request is merged. About 15 minutes. Commands are for **PowerShell on Windows 11**; they also work in a macOS or Linux terminal. You need the M1 setup (uv installed).
 
-```bash
+## Script
+
+```powershell
+cd canada-data-migration
+git switch main
 git pull
-uv sync
-uv run cdm run                # 1. ingest + dbt build; expected: all models and tests PASS
+uv sync                        # 1. installs dbt-core and dbt-duckdb from the lock file
+uv run pytest                  # 2. expected: all tests pass, including the offline dbt build
+uv run cdm run                 # 3. ingest + dbt build. Expected last line: "Done. PASS=66 WARN=0 ERROR=0 ..."
 cd dbt
-uv run dbt source freshness   # 2. expected: PASS (or WARN with a clear reason, e.g. a weekend)
-uv run dbt docs generate      # 3. builds the docs site
-uv run dbt docs serve         # 4. opens the docs in the browser
+uv run dbt source freshness    # 4. expected: PASS for the four series (WARN only with a clear reason)
+uv run dbt docs generate       # 5. builds the docs site into dbt\target
+uv run dbt docs serve          # 6. opens the docs in the browser; Ctrl+C to stop
+cd ..
 ```
 
-Check:
+Look at the mart:
 
-- [ ] Step 1 ends with zero errors; note the number of models and tests in the M2 note.
-- [ ] In the docs site (step 4), the lineage graph shows sources -> staging -> marts.
-- [ ] `mart_monthly_indicators` has one row per month, with CPI, unemployment rate, average USD/CAD and the policy rate.
-- [ ] Break a test on purpose: insert a duplicate row into the raw table (command given in the M2 note), run `dbt build`, see the `unique` test fail, then run `uv run cdm ingest` and `dbt build` again and see it pass.
-- [ ] You can explain why `fct_observation` is long (one row per indicator per date) and the mart is wide.
+```powershell
+uv run cdm sql "SELECT * FROM marts.mart_monthly_indicators ORDER BY month_start DESC LIMIT 13"
+```
+
+Break a test on purpose, then let the pipeline repair it:
+
+```powershell
+# 7. Overwrite the latest policy rate with an impossible value
+uv run cdm sql "UPDATE raw.observations SET value = 99 WHERE series_key = 'policy_rate' AND ref_date = (SELECT max(ref_date) FROM raw.observations WHERE series_key = 'policy_rate')"
+uv run cdm run --skip-ingest   # 8. expected: FAIL 1 assert_values_within_plausible_range, ERROR=1
+uv run cdm run                 # 9. ingest re-reads the lookback window: policy_rate shows upd 1; build PASS
+```
+
+## Check
+
+- [ ] Step 3 ends with `ERROR=0`; write the PASS count in the M2 note.
+- [ ] Step 4: four `PASS` lines (one per series).
+- [ ] In the docs site (step 6), the lineage graph (button at the bottom right) shows sources -> staging -> marts, and each model has descriptions and tests.
+- [ ] The mart query shows one row per month with CPI, its year-over-year change, unemployment rate, average USD/CAD and the policy rate. The latest month can have empty CPI and unemployment: Statistics Canada has not published it yet.
+- [ ] Steps 7-9: the test fails, then `cdm run` repairs the value from the API and the build passes. You can explain why (lookback window, ADR 0005).
+- [ ] You can explain why `fct_observation` is long (one row per indicator per date) and the mart is wide (one column per indicator).

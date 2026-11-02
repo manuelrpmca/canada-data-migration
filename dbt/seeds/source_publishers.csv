@@ -1,0 +1,3 @@
+source,publisher,licence_name,licence_url,attribution
+valet,Bank of Canada,Bank of Canada terms of use,https://www.bankofcanada.ca/terms/,"Exchange rate and interest rate data from the Bank of Canada, via the Valet API."
+statcan,Statistics Canada,Statistics Canada Open Licence,https://www.statcan.gc.ca/en/terms-conditions/open-licence,"Adapted from Statistics Canada data tables. This does not constitute an endorsement by Statistics Canada of this product."

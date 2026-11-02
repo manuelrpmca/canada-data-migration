@@ -2,7 +2,7 @@
 
 Live status of every milestone task. Updated in each pull request. Hours are the owner's actual hours, logged at milestone close; estimates live in the [plan](../plan.md).
 
-Last updated: 2026-10-30
+Last updated: 2026-11-01
 
 ## Milestones
 
@@ -10,7 +10,7 @@ Last updated: 2026-10-30
 | --- | --- | --- | --- | --- | --- | --- |
 | M0. Foundations | In progress (plan merged) | Oct 29 - Nov 4 | 10-14 | | | [m0](../notes/m0-foundations.md) |
 | M1. Ingestion | In progress | Nov 2 - Nov 8 | 6-8 | | | [m1](../notes/m1-ingestion.md) |
-| M2. dbt models | Not started | Nov 9 - Nov 13 | 6-8 | | | |
+| M2. dbt models | In review (PR open) | Nov 9 - Nov 13 | 6-8 | | | [m2](../notes/m2-dbt-models.md) |
 | M3. Automation and v0.1 | Not started | Nov 12 - Nov 20 | 5-7 | | | |
 
 ## M0 tasks
@@ -40,6 +40,18 @@ Last updated: 2026-10-30
 | First real ingest (two runs, idempotent) and results in the M1 note | Claude | Done | PR #3 |
 | Run the M1 QA script on Windows 11 | Manuel | Not started | [QA M1](../qa/m1-ingestion.md) |
 
+## M2 tasks
+
+| Task | Owner | Status | Link |
+| --- | --- | --- | --- |
+| dbt project, DuckDB target, sources with per-series freshness | Claude | Done | M2 PR |
+| Staging models; `dim_date`, `dim_indicator`, `fct_observation`, `mart_monthly_indicators` | Claude | Done | M2 PR |
+| Generic and singular tests, unit test for the mart; `dbt docs generate` | Claude | Done | M2 PR |
+| `uv run cdm run` = ingest + `dbt build`; `cdm sql` for QA | Claude | Done | M2 PR |
+| Offline pytest that builds the dbt project on synthetic data | Claude | Done | M2 PR |
+| dbt Fundamentals course (before reviewing M2) | Manuel | Not started | |
+| Run the M2 QA script on Windows 11 | Manuel | Not started | [QA M2](../qa/m2-dbt-models.md) |
+
 ## Open questions
 
 | Question | Asked | Answer |
@@ -51,6 +63,8 @@ Last updated: 2026-10-30
 
 | Date | Event |
 | --- | --- |
+| 2026-11-01 | M2 dbt models built; `dbt build` PASS=66 on real data. PR opened. |
+| 2026-10-30 | PR #3 merged: live ID verification and first real ingest. |
 | 2026-10-30 | Series identifiers verified live; StatCan vectors 41691919 and 2063949 set; first real ingest recorded in the M1 note. |
 | 2026-10-30 | PR #2 merged: M1 ingestion code. |
 | 2026-10-29 | M1 started on branch `feat/m1-ingestion`. |

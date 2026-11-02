@@ -1,0 +1,79 @@
+version: 2
+
+# Daily series: the Bank of Canada publishes on business days, so the newest reference date
+# is normally one to four days old (weekends, long weekends).
+# Monthly series: the reference date is the first day of the month, and Statistics Canada
+# publishes it during the following month, so the newest one is normally 30 to 80 days old.
+# These thresholds are planning estimates; revisit them if they warn on a normal day.
+
+sources:
+  - name: raw
+    description: Tables written by `uv run cdm ingest` (ADR 0005). Never edited by dbt.
+    schema: raw
+    tables:
+      - name: observations
+        description: One row per series per reference date, upserted on every ingest.
+        columns:
+          - name: source
+            data_tests:
+              - accepted_values:
+                  arguments:
+                    values: ["valet", "statcan"]
+          - name: series_key
+            data_tests: [not_null]
+          - name: ref_date
+            data_tests: [not_null]
+          - name: value
+            data_tests: [not_null]
+
+      - name: series
+        description: Snapshot of config/series.yml, rewritten on every ingest.
+        columns:
+          - name: series_key
+            data_tests: [unique, not_null]
+
+      - name: run_log
+        description: One row per series per ingest run, with inserted, updated and unchanged counts.
+
+      # Freshness, one entry per series so a single stalled series cannot hide behind a
+      # fresh one. Each entry reads raw.observations through a filter; staging reads the
+      # `observations` entry above.
+      - name: freshness_usd_cad
+        identifier: observations
+        description: Freshness check only. USD/CAD rows of raw.observations.
+        config:
+          loaded_at_field: "cast(ref_date as timestamp)"
+          freshness:
+            warn_after: {count: 5, period: day}
+            error_after: {count: 10, period: day}
+            filter: "series_key = 'usd_cad'"
+
+      - name: freshness_policy_rate
+        identifier: observations
+        description: Freshness check only. Policy rate rows of raw.observations.
+        config:
+          loaded_at_field: "cast(ref_date as timestamp)"
+          freshness:
+            warn_after: {count: 5, period: day}
+            error_after: {count: 10, period: day}
+            filter: "series_key = 'policy_rate'"
+
+      - name: freshness_cpi_ontario
+        identifier: observations
+        description: Freshness check only. Ontario CPI rows of raw.observations.
+        config:
+          loaded_at_field: "cast(ref_date as timestamp)"
+          freshness:
+            warn_after: {count: 85, period: day}
+            error_after: {count: 120, period: day}
+            filter: "series_key = 'cpi_ontario'"
+
+      - name: freshness_unemployment_ontario
+        identifier: observations
+        description: Freshness check only. Ontario unemployment rate rows of raw.observations.
+        config:
+          loaded_at_field: "cast(ref_date as timestamp)"
+          freshness:
+            warn_after: {count: 85, period: day}
+            error_after: {count: 120, period: day}
+            filter: "series_key = 'unemployment_ontario'"

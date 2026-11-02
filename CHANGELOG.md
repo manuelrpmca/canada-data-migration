@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- M2 dbt models: dbt Core project in `dbt/` on DuckDB with per-series source freshness, staging views, star schema (`dim_date`, `dim_indicator`, `fct_observation`) and `mart_monthly_indicators`, 57 data tests and a unit test, and a `source_publishers` seed with attribution text.
+- `cdm run` (ingest + `dbt build`) and `cdm sql` (one statement, for QA). `cdm ingest` writes `raw.series` from `config/series.yml`.
+- Offline integration test that runs `dbt build` on a synthetic warehouse.
+- QA script for M2 in PowerShell.
 - M1 ingestion: `cdm` CLI (`ingest`, `status`, `verify`, `find-vector`), Bank of Canada Valet and Statistics Canada WDS clients with retries and back-off, raw landing, idempotent DuckDB upsert with lookback window, run log, unit tests, Dependabot config.
 - QA script for M1 rewritten for PowerShell on Windows 11.
 - Series identifiers verified against the live APIs; StatCan vector IDs set (CPI Ontario 41691919, unemployment rate Ontario 2063949). First real ingest results in the M1 note.

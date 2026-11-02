@@ -1,0 +1,60 @@
+version: 2
+
+models:
+  - name: stg_observations
+    description: >
+      One row per indicator per reference date, cast to stable types and deduplicated on
+      (indicator_key, ref_date), keeping the most recently updated row.
+    data_tests:
+      - unique:
+          arguments:
+            column_name: "indicator_key || '|' || cast(ref_date as varchar)"
+    columns:
+      - name: indicator_key
+        description: Series key from config/series.yml.
+        data_tests: [not_null]
+      - name: source
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["valet", "statcan"]
+      - name: ref_date
+        description: Reference date. Monthly series use the first day of the month.
+        data_tests: [not_null]
+      - name: value
+        data_tests: [not_null]
+
+  - name: stg_series
+    description: One row per configured series.
+    columns:
+      - name: indicator_key
+        data_tests: [unique, not_null]
+      - name: source
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["valet", "statcan"]
+      - name: frequency
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["daily", "monthly"]
+      - name: indicator_name
+        data_tests: [not_null]
+      - name: unit
+        data_tests: [not_null]
+
+  - name: stg_run_log
+    description: One row per series per ingest run.
+    columns:
+      - name: run_id
+        data_tests: [not_null]
+      - name: run_status
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["success", "failed", "skipped"]

@@ -29,11 +29,13 @@ Public portfolio project: ingest Canadian open data, load a "legacy" Oracle sour
 
 ## Current state
 
-- Phase 1. M0 plan merged (PR #1); owner's Phase 0 tasks in progress. M1 ingestion in progress.
+- Phase 1. M0 plan merged (PR #1); owner's Phase 0 tasks in progress. M1 ingestion merged (PRs #2, #3), owner QA pending. M2 dbt models in review.
 - Owner time: 16-20 hours per week. Owner runs QA on Windows 11: QA scripts use PowerShell, no `make` or bash-only syntax.
 - Series identifiers verified against the live APIs on 2026-10-30 (see the [M1 note](docs/notes/m1-ingestion.md)). StatCan vectors: CPI Ontario 41691919, unemployment rate Ontario 2063949.
 - Test fixtures are trimmed responses recorded on 2026-10-30; edge cases (empty or null values) use inline synthetic payloads in the tests.
 - WDS coordinates need all 10 positions; `cdm find-vector` pads them.
+- dbt project in `dbt/`; run with `uv run cdm run` or `cd dbt; uv run dbt build`. Schemas in the DuckDB file: `raw` (ingest), `staging`, `marts`, `reference` (seeds).
+- Business days are inferred from USD/CAD publication days (the policy rate has values on holidays). Adapter-specific SQL goes in macros (`date_spine`).
 
 ## Key facts checked (2026-10-29)
 

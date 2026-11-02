@@ -5,9 +5,10 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
-from cdm import pipeline, settings
+from cdm import pipeline, settings, transform
 from cdm.http import make_client
 from cdm.load import duckdb as warehouse
 from cdm.sources import statcan, valet
@@ -20,7 +21,11 @@ def main(argv: list[str] | None = None) -> int:
 
     p_ingest = sub.add_parser("ingest", help="fetch new data from the APIs and upsert it")
     p_ingest.add_argument("--series", action="append", help="series key (repeatable); default all")
+    p_run = sub.add_parser("run", help="ingest, then dbt build (the full pipeline)")
+    p_run.add_argument("--skip-ingest", action="store_true", help="only run dbt build")
     sub.add_parser("status", help="rows and date range per series, and the last run")
+    p_sql = sub.add_parser("sql", help="run one SQL statement against the warehouse")
+    p_sql.add_argument("statement")
     sub.add_parser("verify", help="check every series identifier against the live APIs")
     p_find = sub.add_parser("find-vector", help="StatCan: vector ID for a table coordinate")
     p_find.add_argument("product_id", type=int)
@@ -32,7 +37,9 @@ def main(argv: list[str] | None = None) -> int:
     db_path = args.db or settings.default_db_path()
     commands = {
         "ingest": lambda: _ingest(db_path, args.series),
+        "run": lambda: _run(db_path, args.skip_ingest),
         "status": lambda: _status(db_path),
+        "sql": lambda: _sql(db_path, args.statement),
         "verify": _verify,
         "find-vector": lambda: _find_vector(args.product_id, args.coordinate),
     }
@@ -41,6 +48,9 @@ def main(argv: list[str] | None = None) -> int:
 
 def _ingest(db_path: Path, only: list[str] | None) -> int:
     series = settings.load_series()
+    con = warehouse.connect(db_path)
+    warehouse.sync_series(con, series, datetime.now(UTC).replace(tzinfo=None))
+    con.close()
     if only:
         unknown = set(only) - {s.key for s in series}
         if unknown:
@@ -61,6 +71,40 @@ def _ingest(db_path: Path, only: list[str] | None) -> int:
             + (f"  {r.message}" if r.message else "")
         )
     return 1 if any(r.status == "failed" for r in results) else 0
+
+
+def _run(db_path: Path, skip_ingest: bool) -> int:
+    if not skip_ingest:
+        code = _ingest(db_path, None)
+        if code != 0:
+            print("Ingest reported a failure; dbt build still runs on the data already loaded.")
+        print()
+    else:
+        code = 0
+    if not db_path.exists():
+        print(f"No warehouse at {db_path}. Run `uv run cdm ingest` first.")
+        return 1
+    ok = transform.build(db_path)
+    return 0 if ok and code == 0 else 1
+
+
+def _sql(db_path: Path, statement: str) -> int:
+    if not db_path.exists():
+        print(f"No warehouse at {db_path}. Run `uv run cdm ingest` first.")
+        return 1
+    con = warehouse.connect(db_path)
+    try:
+        cursor = con.execute(statement)
+        if cursor.description:
+            columns = [d[0] for d in cursor.description]
+            print(" | ".join(columns))
+            for row in cursor.fetchall():
+                print(" | ".join("" if v is None else str(v) for v in row))
+        else:
+            print("OK")
+    finally:
+        con.close()
+    return 0
 
 
 def _status(db_path: Path) -> int:

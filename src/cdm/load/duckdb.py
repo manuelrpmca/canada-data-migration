@@ -12,6 +12,7 @@ from pathlib import Path
 
 import duckdb
 
+from cdm.settings import Series
 from cdm.sources import Observation
 
 SCHEMA_SQL = """
@@ -28,6 +29,21 @@ CREATE TABLE IF NOT EXISTS raw.observations (
     run_id        VARCHAR   NOT NULL,  -- run that last wrote the row
     payload_hash  VARCHAR   NOT NULL,  -- sha256 of the landed file that last wrote the row
     PRIMARY KEY (source, series_key, ref_date)
+);
+
+-- Snapshot of config/series.yml, rewritten on every ingest so dbt can describe each series
+-- without a second copy of the metadata (dim_indicator reads it).
+CREATE TABLE IF NOT EXISTS raw.series (
+    series_key    VARCHAR   NOT NULL PRIMARY KEY,
+    source        VARCHAR   NOT NULL,
+    series_id     VARCHAR,
+    product_id    BIGINT,
+    name          VARCHAR   NOT NULL,
+    unit          VARCHAR   NOT NULL,
+    frequency     VARCHAR   NOT NULL,
+    start_date    DATE      NOT NULL,
+    verified      BOOLEAN   NOT NULL,
+    synced_at     TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS raw.run_log (
@@ -130,6 +146,24 @@ def upsert_observations(
         raise
     received = len(by_date)
     return LoadCounts(received, inserted, updated, received - inserted - updated)
+
+
+def sync_series(con: duckdb.DuckDBPyConnection, series: list[Series], now: datetime) -> None:
+    """Replace raw.series with the current config, in one transaction."""
+    rows = [
+        (s.key, s.source, s.series_id, s.product_id, s.name, s.unit, s.frequency,
+         s.start_date, s.verified, now)
+        for s in series
+    ]  # fmt: skip
+    con.execute("BEGIN TRANSACTION")
+    try:
+        con.execute("DELETE FROM raw.series")
+        if rows:
+            con.executemany("INSERT INTO raw.series VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
+        con.execute("COMMIT")
+    except Exception:
+        con.execute("ROLLBACK")
+        raise
 
 
 def log_run(con: duckdb.DuckDBPyConnection, **fields) -> None:

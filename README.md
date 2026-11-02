@@ -1,6 +1,6 @@
 # Canada Data Migration
 
-> **Work in progress.** Nothing here runs yet. This repository currently holds the plan: scope, architecture decisions and milestones. The first runnable release is v0.1 (see [the milestone plan](docs/plan.md)).
+> **Work in progress.** Ingestion (M1) and the dbt models (M2) run locally with `uv run cdm run`; see the [QA scripts](docs/qa/). The first release is v0.1 (see [the milestone plan](docs/plan.md)).
 
 A small, public version of a real-world data migration: ingest Canadian open data, load it into a "legacy" database, migrate it to a cloud warehouse, and **prove that the data arrived intact** with automated reconciliation.
 
