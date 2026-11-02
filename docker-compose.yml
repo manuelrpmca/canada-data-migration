@@ -1,0 +1,29 @@
+# Oracle Database Free: the governed "legacy" system of record (ADR 0009).
+# Start it with `uv run cdm oracle up` (it also creates the passwords in .env and runs setup);
+# stop it with `uv run cdm oracle down`. Needs Docker Desktop on Windows and macOS.
+#
+# Image: gvenzl/oracle-free, the community image by Gerald Venzl (Oracle product manager),
+# "slim-faststart" variant: the database is created inside the image, so the first start takes
+# about 40 seconds instead of minutes. Measured 2026-11-02 on Linux: ready in 39 s, 2.1 GiB of
+# memory, 6.5 GB on disk once unpacked (1.3 GB download). Pinned by digest for reproducibility.
+name: cdm
+
+services:
+  oracle:
+    image: gvenzl/oracle-free:23.26.3-slim-faststart@sha256:f5ff19033860d662c821cb04eb10483fa94f14f78eae252d054291ea07028093
+    container_name: cdm-oracle
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD:?run uv run cdm oracle up, which creates it in .env}
+    ports:
+      - "127.0.0.1:${ORACLE_PORT:-1521}:1521"  # reachable from this computer only
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 5s
+      timeout: 10s
+      retries: 60
+      start_period: 10s
+
+volumes:
+  oracle-data:
