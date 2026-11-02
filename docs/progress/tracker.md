@@ -11,7 +11,7 @@ Last updated: 2026-11-02
 | M0. Foundations | In progress (plan merged) | Oct 29 - Nov 4 | 10-14 | | [m0](../notes/m0-foundations.md) |
 | M1. Ingestion | In progress | Nov 2 - Nov 8 | 6-8 | | [m1](../notes/m1-ingestion.md) |
 | M2. dbt models | Merged; QA passed on Windows 11 | Nov 9 - Nov 13 | 6-8 | 2026-11-02 | [m2](../notes/m2-dbt-models.md) |
-| M3. Automation and v0.1 | Merged (PR #10); release PR next | Nov 12 - Nov 20 | 5-7 | | [m3](../notes/m3-automation-v0.1.md) |
+| M3. Automation and v0.1 | QA passed on Windows 11; release PR open | Nov 12 - Nov 20 | 5-7 | 2026-11-02 | [m3](../notes/m3-automation-v0.1.md) |
 
 ## M0 tasks
 
@@ -62,11 +62,11 @@ Last updated: 2026-11-02
 | Clear errors: HTTP 403 (VPN), connection error, missing warehouse | Claude | Done | PR #10 |
 | README v0.1 with badges and real-run results; CHANGELOG; M3 QA script and note | Claude | Done | PR #10 |
 | Fresh-clone dry run of the QA script before handoff | Claude | Done (Linux; Windows covered by CI jobs) | PR #10 |
-| Run the M3 QA script on Windows 11 | Manuel | Not started | [QA M3](../qa/m3-automation-v0.1.md) |
+| Run the M3 QA script on Windows 11 | Manuel | Done 2026-11-02 | [QA M3](../qa/m3-automation-v0.1.md) |
 | README chart from real data (`cdm chart`) and dbt docs on GitHub Pages, refreshed daily | Claude | Done | Release PR |
 | Regulated-sector framing for v1.0 in README, ADR 0002, ADR 0009, plan, structure | Claude | Done | Release PR |
 | Turn on GitHub Pages: Settings > Pages > Source: GitHub Actions | Manuel | Not started | |
-| Release PR: CHANGELOG 0.1.0, version, QA results, release notes | Claude | After QA | |
+| Release PR: CHANGELOG 0.1.0, version, QA results, release notes | Claude | Done | Release PR |
 | Publish release `v0.1` | Manuel | After the release PR | |
 
 ## Open questions

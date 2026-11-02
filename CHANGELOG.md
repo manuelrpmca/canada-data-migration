@@ -4,7 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
-Planned as `0.1.0`; the version and date are set in the release pull request after the owner's M3 QA run.
+## [0.1.0] - 2026-11-02
+
+First release: four Canadian open-data series ingested daily, modelled with dbt on DuckDB, tested on Linux and Windows. Owner's QA passed on Windows 11 on 2026-11-02.
 
 ### Added
 
@@ -22,13 +24,15 @@ Planned as `0.1.0`; the version and date are set in the release pull request aft
 - QA script for M2 in PowerShell.
 - M1 ingestion: `cdm` CLI (`ingest`, `status`, `verify`, `find-vector`), Bank of Canada Valet and Statistics Canada WDS clients with retries and back-off, raw landing, idempotent DuckDB upsert with lookback window, run log, unit tests, Dependabot config.
 - QA script for M1 rewritten for PowerShell on Windows 11.
+- Project plan for Phase 0 and Phase 1: repository structure, ADRs 0001-0009, milestone plan with QA scripts, progress tracker and milestone note for M0.
+- MIT license, `.gitignore`, `.env.example` with empty keys, `MEMORY.md`.
+- README with "work in progress" status, planned architecture diagram and data attribution.
 - Series identifiers verified against the live APIs; StatCan vector IDs set (CPI Ontario 41691919, unemployment rate Ontario 2063949). First real ingest results in the M1 note.
 
 ### Changed
 
 - v1.0 framing: the Oracle legacy source is a governed system of record in the style of regulated organizations (banks, insurers, public sector) instead of "bank-style" (README, ADR 0002, ADR 0009, plan).
 - Milestone notes and the tracker no longer ask for owner hours or a "what I learned" line.
-
 - Failed series explain the likely cause in one line: HTTP 403 points to a VPN or company network, a connection error to the network or proxy.
 - A missing warehouse is reported with the command that creates it (`uv run cdm run`), and `cdm dbt` no longer creates an empty warehouse file.
 
@@ -38,10 +42,8 @@ Planned as `0.1.0`; the version and date are set in the release pull request aft
 ### Fixed
 
 - `cdm dbt --version` and other dbt options right after `cdm dbt` were rejected by the `cdm` argument parser; everything after `dbt` now goes to dbt unchanged (found by the new CI smoke test).
-
 - `cdm` finds the repository root from any subfolder (for example `dbt\`), instead of failing with `FileNotFoundError` on `config\series.yml`.
 - `cdm find-vector` pads the coordinate to the 10 positions WDS requires (a shorter one returned HTTP 406).
 
-- Project plan for Phase 0 and Phase 1: repository structure, ADRs 0001-0009, milestone plan with QA scripts, progress tracker and milestone note for M0.
-- MIT license, `.gitignore`, `.env.example` with empty keys, `MEMORY.md`.
-- README with "work in progress" status, planned architecture diagram and data attribution.
+[Unreleased]: https://github.com/manuelrpmca/canada-data-migration/compare/v0.1...HEAD
+[0.1.0]: https://github.com/manuelrpmca/canada-data-migration/releases/tag/v0.1

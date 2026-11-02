@@ -1,6 +1,6 @@
 [project]
 name = "canada-data-migration"
-version = "0.0.0"
+version = "0.1.0"
 description = "Ingest Canadian open data, migrate it from a legacy database to cloud warehouses, and prove it arrived intact."
 readme = "README.md"
 license = "MIT"
