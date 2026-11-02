@@ -11,7 +11,7 @@ Last updated: 2026-11-02
 | M0. Foundations | In progress (plan merged) | Oct 29 - Nov 4 | 10-14 | | | [m0](../notes/m0-foundations.md) |
 | M1. Ingestion | In progress | Nov 2 - Nov 8 | 6-8 | | | [m1](../notes/m1-ingestion.md) |
 | M2. dbt models | Merged; QA passed on Windows 11 | Nov 9 - Nov 13 | 6-8 | | 2026-11-02 | [m2](../notes/m2-dbt-models.md) |
-| M3. Automation and v0.1 | Not started | Nov 12 - Nov 20 | 5-7 | | | |
+| M3. Automation and v0.1 | In review (PR #10) | Nov 12 - Nov 20 | 5-7 | | | [m3](../notes/m3-automation-v0.1.md) |
 
 ## M0 tasks
 
@@ -52,6 +52,19 @@ Last updated: 2026-11-02
 | dbt Fundamentals course (before reviewing M2) | Manuel | Not started | |
 | Run the M2 QA script on Windows 11 | Manuel | Done 2026-11-02 (break-a-test steps 7-9 optional, not run) | [QA M2](../qa/m2-dbt-models.md) |
 | Windows fixes found in QA: `cdm dbt`, root search from subfolders, troubleshooting table | Claude | Done | PRs #5, #6, #7 |
+
+## M3 tasks
+
+| Task | Owner | Status | Link |
+| --- | --- | --- | --- |
+| `ci.yml`: lint, format, tests, dbt build, CLI smoke test on Linux and Windows | Claude | Done | PR #10 |
+| `daily.yml`: live run, freshness, summary, artifact, incremental through the cache | Claude | Done | PR #10 |
+| Clear errors: HTTP 403 (VPN), connection error, missing warehouse | Claude | Done | PR #10 |
+| README v0.1 with badges and real-run results; CHANGELOG; M3 QA script and note | Claude | Done | PR #10 |
+| Fresh-clone dry run of the QA script before handoff | Claude | Done (Linux; Windows covered by CI jobs) | PR #10 |
+| Run the M3 QA script on Windows 11 | Manuel | Not started | [QA M3](../qa/m3-automation-v0.1.md) |
+| Release PR: CHANGELOG 0.1.0, version, QA results, release notes | Claude | After QA | |
+| Publish release `v0.1` | Manuel | After the release PR | |
 
 ## Open questions
 
