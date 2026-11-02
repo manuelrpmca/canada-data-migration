@@ -35,6 +35,7 @@ If the repository is already cloned, skip step 3. If it is cloned somewhere othe
 
 | Error | Cause | Fix |
 | --- | --- | --- |
+| `-bash: cd: /home/<user>canada-data-migration: No such file or directory`, with a prompt like `[user@server ~]$` | The window is a bash terminal on another computer (for example an SSH session to a web host), not PowerShell on the Windows PC; seen 2026-11-02 | Close it and open **Windows PowerShell** from the Start menu; the prompt must start with `PS C:\` |
 | `cd : Cannot find path 'C:\Users\<you>\canada-data-migration'` | The repository is not cloned in the home folder | Run step 3 of the setup, or `cd` to where it is cloned |
 | `fatal: not a git repository` | PowerShell is not inside the repository folder | `cd $HOME\canada-data-migration` |
 | `uv : The term 'uv' is not recognized` | uv is not installed, or was installed in this window and PATH is stale | Run steps 1 and 2 of the setup, then `uv --version` |
