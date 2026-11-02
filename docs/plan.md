@@ -59,6 +59,9 @@ Done when: the four public profiles (GitHub, LinkedIn, website, Credly) link to 
 ### M3. Automation and v0.1
 
 - `ci.yml` and `daily.yml` ([ADR 0008](decisions/0008-orchestration-and-ci.md)); CI badge in README.
+- `ci.yml` runs lint and tests on both `ubuntu-latest` and `windows-latest`, so problems on the owner's platform show up in CI, not during QA (lesson from the M2 QA run).
+- Clear error messages for the failures seen in M2 QA: a StatCan HTTP 403 says it is often caused by a VPN; a missing warehouse says which command creates it.
+- Before handing over QA, the M3 QA script is run from a fresh clone, as written ([MEMORY.md](../MEMORY.md), "Working agreement").
 - README final for v0.1: problem in one line, diagram, stack, one-command run, results from a real run, decisions, limits, next steps. "Work in progress" banner comes off.
 - Tag `v0.1` and publish release notes (needs the owner's approval, as with anything public).
 
@@ -81,4 +84,6 @@ Planned at the start of Phase 2, after v0.1 is merged and tagged. Indicative onl
 | StatCan locks tables before 8:30 a.m. Eastern (HTTP 409) | Failed scheduled run | Schedule after release time; treat 409 as retry-later |
 | Owner hours fall below 16 per week | Dates slip | Re-date the plan in the tracker; scope stays fixed, dates move |
 | Oracle Free is too heavy for CI runners | Oracle path not in CI | Measure in M4; fall back to a manual workflow ([ADR 0009](decisions/0009-legacy-source-and-reconciliation.md)) |
+| Claude verifies on Linux, the owner runs QA on Windows | QA finds setup and path problems late (seven in the M2 QA run) | Windows job in CI from M3; fresh-clone dry run of every QA script; troubleshooting table in [qa/README.md](qa/README.md) |
+| A VPN or company network blocks a public API (StatCan 403 in M2 QA) | Ingest fails for that source | Turn the VPN off for runs; the daily run in CI does not depend on the owner's network |
 | BigQuery sandbox has no DML and 60-day expiry | Incremental loads impossible there | Replace-style loads, fully rebuildable tables ([ADR 0006](decisions/0006-warehouses.md)) |

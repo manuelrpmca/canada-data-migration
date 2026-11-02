@@ -28,6 +28,25 @@ Public portfolio project: ingest Canadian open data, load a "legacy" Oracle sour
 - Commit messages: imperative mood, short subject (for example, "Add Valet API client").
 - Python 3.12, uv, ruff, pytest; single CLI `uv run cdm <command>` ([ADR 0004](docs/decisions/0004-python-toolchain.md)).
 
+## Working agreement (from the M2 retrospective, 2026-11-02)
+
+**Definition of done for a milestone pull request.** Before asking the owner to review:
+
+1. Lint, format and tests pass, and the change ran against real data. Say where: "verified in Claude's Linux environment" is not "verified on Windows".
+2. The QA script was run top to bottom from a fresh clone in an empty folder, exactly as written. Any step that needs a tool, a folder or a network condition says so.
+3. Every command in the QA script works from the repository folder (no `cd` into subfolders) and is listed in `cdm --help` or the uv docs.
+4. Known environment risks are written in the QA script before the run (VPN, company network, first-time downloads), not discovered during it.
+5. From M3 on, CI runs the tests on `windows-latest` as well as Linux, so Windows problems show up before the owner's QA.
+
+**QA handoff protocol.**
+
+- One handoff message per milestone: three to five commands with the expected result of each, copied from the merged QA script. No other commands in chat.
+- No changes to the guide or code while the owner is running QA. Problems found during QA are answered in chat with a workaround, then fixed together in **one** follow-up pull request after the run.
+- Every error the owner hits goes into the troubleshooting table in [docs/qa/README.md](docs/qa/README.md).
+- Before answering an error, read it fully and name its cause (code, environment or instructions), then give one fix.
+
+**Pull requests.** At most two per milestone (the work, then one follow-up). Small doc fixes wait for the next pull request instead of opening their own.
+
 ## Current state
 
 - Phase 1. M0 plan merged (PR #1); owner's Phase 0 tasks in progress. M1 ingestion merged (PRs #2, #3), owner QA pending. M2 dbt models in review.
