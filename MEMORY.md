@@ -45,6 +45,14 @@ Public portfolio project: ingest Canadian open data, load a "legacy" Oracle sour
 - Every error the owner hits goes into the troubleshooting table in [docs/qa/README.md](docs/qa/README.md).
 - Before answering an error, read it fully and name its cause (code, environment or instructions), then give one fix.
 
+**Back and forth with the owner (chat).**
+
+- Every answer to an error starts with a one-line verdict: blocking or not, and whether to continue. Then the cause in one sentence, then one copy-paste block of commands with the expected result of each.
+- One question or decision per message, with a recommended option. No lists of alternatives to try in sequence.
+- The owner pastes the full output of the last command; Claude does not guess from a partial one.
+- When Claude cannot know something about the owner's machine (network, folders, installed tools), it asks one diagnostic command first instead of guessing a fix.
+- Results that matter (pass counts, errors) are written into the repository in the follow-up pull request, so the next session does not depend on the chat.
+
 **Pull requests.** At most two per milestone (the work, then one follow-up). Small doc fixes wait for the next pull request instead of opening their own.
 
 ## Current state
