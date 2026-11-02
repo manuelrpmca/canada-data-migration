@@ -55,3 +55,40 @@ jobs:
 
       - name: CLI smoke test (dbt through cdm)
         run: uv run cdm dbt --version
+
+  # The governed Oracle source (ADR 0009, M4) against a real Oracle Database Free container,
+  # started with the same command as the owner's QA script. Linux only: GitHub's Windows
+  # runners cannot run Linux containers. No network calls to the data APIs: the tests load
+  # the recorded fixtures.
+  oracle:
+    name: oracle (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
+        with:
+          enable-cache: true
+
+      - name: Install (locked)
+        run: uv sync --locked
+
+      - name: Start Oracle, create passwords in .env, run setup
+        run: uv run cdm oracle up
+
+      - name: Memory used by the Oracle container
+        run: docker stats --no-stream cdm-oracle
+
+      - name: Oracle integration tests
+        run: uv run pytest -m oracle
+        env:
+          CDM_ORACLE_TESTS: "1"
+
+      - name: Setup runs again without changes
+        run: uv run cdm oracle setup

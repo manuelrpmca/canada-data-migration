@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- M4 governed Oracle source ([ADR 0009](docs/decisions/0009-legacy-source-and-reconciliation.md), now accepted): Oracle Database Free 23ai in Docker (`docker-compose.yml`, image pinned by digest); schema in `oracle/` with reference tables, landed files kept as received with their SHA-256, effective-dated revisions (`known_from`, `known_to`, one current value per period enforced by an index), `observation_as_of` for "what was known on day X", a load audit, a data dictionary with a description and a classification annotation for every column, and three accounts (schema-only owner, loader that can only run the package, read-only migration user).
+- PL/SQL package `cdm_load`: parses each landed response with `JSON_TABLE` and applies it in one transaction; refuses files out of fetch order; audits failed loads.
+- `cdm oracle up | down | setup | load | status | sql | compare`; `up` creates random passwords in `.env`. Uses `python-oracledb` in thin mode.
+- Oracle integration tests and an `oracle` CI job on `ubuntu-latest` that starts the container with `cdm oracle up`.
+- QA script and note for M4.
+
 ## [0.1.0] - 2026-11-02
 
 First release: four Canadian open-data series ingested daily, modelled with dbt on DuckDB, tested on Linux and Windows. Owner's QA passed on Windows 11 on 2026-11-02.

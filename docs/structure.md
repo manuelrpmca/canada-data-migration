@@ -19,6 +19,7 @@ canada-data-migration/
 │   ├── sources/              # One API client per source: valet.py, statcan.py
 │   ├── landing.py            # Writes raw API responses to data/raw/ unchanged
 │   ├── load/                 # One loader per target: duckdb.py [M1], oracle.py [M4], bigquery.py [M5]
+│   ├── container.py          # Starts and stops the Oracle container with Docker Compose [M4]
 │   └── reconcile/            # Counts, control totals, fingerprints, HTML report     [M6]
 ├── dbt/                      # dbt project                                           [M2]
 │   ├── models/staging/       # One model per source table: rename, cast, deduplicate
