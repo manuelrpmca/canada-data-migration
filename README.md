@@ -46,7 +46,7 @@ Dotted boxes with "v1.0" are planned, not built.
 
 You need [uv](https://docs.astral.sh/uv/) (it installs Python 3.12 for the project) and Git. No accounts, keys or cloud services.
 
-```powershell
+```bash
 git clone https://github.com/manuelrpmca/canada-data-migration.git
 cd canada-data-migration
 uv run cdm run                              # downloads the data, then builds and tests the dbt models
@@ -57,13 +57,13 @@ uv run cdm sql "SELECT * FROM marts.mart_monthly_indicators ORDER BY month_start
 
 The same commands work in PowerShell on Windows and in a macOS or Linux terminal. The warehouse is a single file, `data/warehouse.duckdb`. Run `uv run cdm --help` for every command, `uv run cdm dbt docs generate` then `uv run cdm dbt docs serve` for the model documentation, and `uv run cdm chart` to redraw the chart above.
 
-On a VPN or company network, Statistics Canada may answer `403 Forbidden`; turn the VPN off and run again ([troubleshooting](docs/qa/README.md#troubleshooting-errors-seen-on-windows)).
+On a VPN or company network, Statistics Canada may answer `403 Forbidden`; turn the VPN off and run again ([troubleshooting](docs/qa/README.md#troubleshooting-ubuntu)).
 
 ### The Oracle system of record (v1.0, milestone M4)
 
-Needs [Docker Desktop](https://www.docker.com/products/docker-desktop/) running, about 2 GiB of free memory and 7 GB of disk. No Oracle client and no SQL*Plus.
+Needs Docker running (on Ubuntu, `sudo apt install docker.io docker-compose-v2`; on Windows and macOS, [Docker Desktop](https://www.docker.com/products/docker-desktop/)), about 2 GiB of free memory and 7 GB of disk. No Oracle client and no SQL*Plus.
 
-```powershell
+```bash
 uv run cdm oracle up        # starts Oracle Database Free in Docker, creates passwords in .env, builds the schema
 uv run cdm oracle load      # loads every landed API response through the PL/SQL package
 uv run cdm oracle compare   # rows and totals per series, Oracle against DuckDB

@@ -1,6 +1,7 @@
 # Checks on every pull request and push to main (ADR 0008). No network calls to the data APIs:
 # unit tests use recorded fixtures and the dbt build runs on a synthetic warehouse, so CI is
-# deterministic. Windows runs too, because the owner's QA runs on Windows 11 (M2 retrospective).
+# deterministic. Windows runs too, so the project stays portable (the owner's QA ran on Windows 11
+# until M3, on Ubuntu from M4).
 name: ci
 
 on:

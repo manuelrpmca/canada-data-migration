@@ -12,6 +12,11 @@ All notable changes to this project are documented here. The format follows [Kee
 - Oracle integration tests and an `oracle` CI job on `ubuntu-latest` that starts the container with `cdm oracle up`.
 - QA script and note for M4.
 
+### Changed
+
+- QA scripts are Ubuntu-first from M4 (the owner's main computer moved to Ubuntu): bash rules and one-time setup in `docs/qa/README.md`, M4 script installs Docker Engine from Ubuntu's packages instead of Docker Desktop. The M0 to M3 scripts and the Windows troubleshooting stay as a record; CI still runs on Windows.
+- `cdm oracle` Docker errors say how to fix them on Ubuntu, Windows and macOS, and a permission error on the Docker socket now says to join the `docker` group instead of "not running".
+
 ## [0.1.0] - 2026-11-02
 
 First release: four Canadian open-data series ingested daily, modelled with dbt on DuckDB, tested on Linux and Windows. Owner's QA passed on Windows 11 on 2026-11-02.

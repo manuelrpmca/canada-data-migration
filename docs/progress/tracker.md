@@ -2,7 +2,7 @@
 
 Live status of every milestone task. Updated in each pull request.
 
-Last updated: 2026-11-02
+Last updated: 2026-11-09
 
 ## Milestones
 
@@ -82,19 +82,21 @@ Last updated: 2026-11-02
 | `cdm oracle load`, `status`, `sql`, `compare`; real-data run, 4 of 4 match | Claude | Done | PR #12 |
 | Integration tests against real Oracle; `oracle` CI job on Linux | Claude | Done | PR #12 |
 | ADR 0009 accepted; M4 QA script with Docker Desktop install; note | Claude | Done | PR #12 |
-| Install Docker Desktop and run the M4 QA script on Windows 11 | Manuel | After merge | [QA M4](../qa/m4-oracle-source.md) |
+| QA moved to Ubuntu: rules, setup, M4 script with Docker Engine, clearer Docker errors; fresh-clone dry run on Ubuntu 24.04 | Claude | Done | M4 follow-up PR |
+| Install Docker Engine and run the M4 QA script on Ubuntu | Manuel | After merge | [QA M4](../qa/m4-oracle-source.md) |
 
 ## Open questions
 
 | Question | Asked | Answer |
 | --- | --- | --- |
-| Which OS does Manuel run the QA scripts on (macOS, Windows, Linux)? | 2026-10-29 | Windows 11; QA scripts use PowerShell |
+| Which OS does Manuel run the QA scripts on (macOS, Windows, Linux)? | 2026-10-29 | Windows 11 with PowerShell for M0 to M3; Ubuntu 24.04 with bash from M4 (changed 2026-11-09) |
 | Are the v0.1 series (USD/CAD, policy rate, Ontario CPI, Ontario unemployment rate) the right four? | 2026-10-29 | Yes |
 
 ## Log
 
 | Date | Event |
 | --- | --- |
+| 2026-11-09 | Owner moved to Ubuntu: QA scripts are Ubuntu-first from M4; M4 QA script dry-run from a fresh clone on Ubuntu 24.04 (Oracle compare 4 of 4 match, 12 Oracle tests passed). Windows stays in CI. |
 | 2026-11-02 | M4 started: Oracle Free measured, governed schema and PL/SQL load built, `oracle` CI job green. PR #12. |
 | 2026-11-02 | `v0.1` released. |
 | 2026-11-02 | Owner's M2 QA on Windows 11: `cdm run` PASS=66 ERROR=0, freshness 4 of 4 PASS, docs generated and served. PRs #6 and #7 merged. |
