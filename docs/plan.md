@@ -84,6 +84,6 @@ Planned at the start of Phase 2, after v0.1 is merged and tagged. Indicative onl
 | StatCan locks tables before 8:30 a.m. Eastern (HTTP 409) | Failed scheduled run | Schedule after release time; treat 409 as retry-later |
 | Owner hours fall below 16 per week | Dates slip | Re-date the plan in the tracker; scope stays fixed, dates move |
 | Oracle Free is too heavy for CI runners | Oracle path not in CI | Measured in M4: 2.0 GiB, healthy 6 seconds after start on a GitHub runner, whole job 78 seconds; runs in the `oracle` CI job on `ubuntu-latest` ([ADR 0009](decisions/0009-legacy-source-and-reconciliation.md)) |
-| Claude verifies on Linux, the owner runs QA on Windows | QA finds setup and path problems late (seven in the M2 QA run) | Windows job in CI from M3; fresh-clone dry run of every QA script; troubleshooting table in [qa/README.md](qa/README.md) |
+| The owner's machine differs from Claude's environment (Windows until M3, Ubuntu from M4) | QA finds setup and path problems late (seven in the M2 QA run on Windows) | Fresh-clone dry run of every QA script on Ubuntu; Linux and Windows jobs in CI; troubleshooting table in [qa/README.md](qa/README.md) |
 | A VPN or company network blocks a public API (StatCan 403 in M2 QA) | Ingest fails for that source | Turn the VPN off for runs; the daily run in CI does not depend on the owner's network |
 | BigQuery sandbox has no DML and 60-day expiry | Incremental loads impossible there | Replace-style loads, fully rebuildable tables ([ADR 0006](decisions/0006-warehouses.md)) |

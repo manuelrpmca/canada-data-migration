@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 from datetime import date, datetime
 
 import pytest
@@ -79,5 +80,28 @@ def test_compare_flags_any_difference():
 
 def test_missing_docker_says_how_to_install(monkeypatch):
     monkeypatch.setattr(container.shutil, "which", lambda _: None)
-    with pytest.raises(container.DockerError, match="Docker Desktop"):
+    with pytest.raises(container.DockerError, match="docker.io docker-compose-v2"):
+        container.check_docker()
+
+
+def _fake_docker_info(returncode, stderr):
+    def run(*args, **kwargs):
+        return subprocess.CompletedProcess(args[0], returncode, stdout="", stderr=stderr)
+
+    return run
+
+
+def test_docker_permission_denied_says_how_to_join_group(monkeypatch):
+    monkeypatch.setattr(container.shutil, "which", lambda _: "/usr/bin/docker")
+    stderr = "permission denied while trying to connect to the Docker daemon socket"
+    monkeypatch.setattr(container.subprocess, "run", _fake_docker_info(1, stderr))
+    with pytest.raises(container.DockerError, match="usermod -aG docker"):
+        container.check_docker()
+
+
+def test_docker_not_running_says_how_to_start(monkeypatch):
+    monkeypatch.setattr(container.shutil, "which", lambda _: "/usr/bin/docker")
+    stderr = "Cannot connect to the Docker daemon. Is the docker daemon running?"
+    monkeypatch.setattr(container.subprocess, "run", _fake_docker_info(1, stderr))
+    with pytest.raises(container.DockerError, match="systemctl start docker"):
         container.check_docker()

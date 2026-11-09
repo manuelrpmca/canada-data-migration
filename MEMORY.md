@@ -17,7 +17,7 @@ Public portfolio project: ingest Canadian open data, load a "legacy" Oracle sour
 7. **English** for everything in the repository: code, comments, commits, PRs, docs.
 8. **Attribution** for Statistics Canada and the Bank of Canada on every published output (see README).
 9. **Explainable.** Every milestone closes with a note and a QA run on the owner's machine.
-10. **QA scripts are Windows-first.** The owner runs them in PowerShell on Windows 11. Follow the rules in [docs/qa/README.md](docs/qa/README.md): PowerShell syntax only, the one-time setup in every script, `cd $HOME\canada-data-migration` as the first and only `cd`, dbt via `uv run cdm dbt ...`, and every new error added to its troubleshooting table.
+10. **QA scripts are Ubuntu-first** (from M4, 2026-11-09; M0 to M3 ran on Windows 11 in PowerShell). The owner runs them in a bash terminal on Ubuntu 24.04 and is new to Ubuntu. Follow the rules in [docs/qa/README.md](docs/qa/README.md): one-line commands with what each does and its expected result, no text editors (file changes are one command), `sudo` flagged and explained, the one-time setup in every script, `cd ~/Documents/projects/canada-data-migration` as the first and only `cd`, dbt via `uv run cdm dbt ...`, and every new error added to its troubleshooting table.
 
 ## Conventions
 
@@ -32,11 +32,11 @@ Public portfolio project: ingest Canadian open data, load a "legacy" Oracle sour
 
 **Definition of done for a milestone pull request.** Before asking the owner to review:
 
-1. Lint, format and tests pass, and the change ran against real data. Say where: "verified in Claude's Linux environment" is not "verified on Windows".
+1. Lint, format and tests pass, and the change ran against real data. Say where: "verified in Claude's environment" is not "verified on the owner's machine".
 2. The QA script was run top to bottom from a fresh clone in an empty folder, exactly as written. Any step that needs a tool, a folder or a network condition says so.
 3. Every command in the QA script works from the repository folder (no `cd` into subfolders) and is listed in `cdm --help` or the uv docs.
 4. Known environment risks are written in the QA script before the run (VPN, company network, first-time downloads), not discovered during it.
-5. From M3 on, CI runs the tests on `windows-latest` as well as Linux, so Windows problems show up before the owner's QA.
+5. CI runs the tests on `windows-latest` as well as Linux (from M3, when the owner used Windows), so the project stays portable.
 
 **QA handoff protocol.**
 
@@ -57,10 +57,10 @@ Public portfolio project: ingest Canadian open data, load a "legacy" Oracle sour
 
 ## Current state
 
-- Phase 1. M0 plan merged (PR #1); owner's Phase 0 tasks in progress. M1 ingestion merged (PRs #2, #3). M2 dbt models merged, owner QA passed 2026-11-02. M3 (CI, daily run, README v0.1) merged in PR #10; owner QA passed 2026-11-02; release PR adds the chart, dbt docs on Pages and version 0.1.0. `v0.1` released 2026-11-02. M4 (governed Oracle source, [ADR 0009](docs/decisions/0009-legacy-source-and-reconciliation.md)) in PR #12; owner QA pending ([script](docs/qa/m4-oracle-source.md)), which includes installing Docker Desktop. Next: M5 (migration to BigQuery and DuckDB).
+- Phase 1. M0 plan merged (PR #1); owner's Phase 0 tasks in progress. M1 ingestion merged (PRs #2, #3). M2 dbt models merged, owner QA passed 2026-11-02. M3 (CI, daily run, README v0.1) merged in PR #10; owner QA passed 2026-11-02; release PR adds the chart, dbt docs on Pages and version 0.1.0. `v0.1` released 2026-11-02. M4 (governed Oracle source, [ADR 0009](docs/decisions/0009-legacy-source-and-reconciliation.md)) in PR #12; owner QA pending on Ubuntu ([script](docs/qa/m4-oracle-source.md)), which includes installing Docker Engine from Ubuntu's packages. Next: M5 (migration to BigQuery and DuckDB).
 - Oracle: `uv run cdm oracle up|load|status|sql|compare|down`. Image pinned by digest in `docker-compose.yml`; passwords generated into the git-ignored `.env`. SQL lives in `oracle/` (statements separated by a `/` line, `{p}` = account prefix). Integration tests use the prefix `CDMTEST` and need `CDM_ORACLE_TESTS=1`; the `oracle` CI job runs them on Linux only (Windows runners cannot run Linux containers).
 - CI: `.github/workflows/ci.yml` (Linux and Windows, no network) and `daily.yml` (live APIs, 15:00 UTC, warehouse kept in the Actions cache under `warehouse-v1-`; bump the version when the raw schema changes). Actions are pinned to commit SHAs. A multi-line `pwsh` step fails only on its last command, so keep one command per step.
-- Owner time: 16-20 hours per week. Owner runs QA on Windows 11: QA scripts use PowerShell, no `make` or bash-only syntax.
+- Owner time: 16-20 hours per week. Owner's main computer is Ubuntu 24.04 since 2026-11-09 (it also runs other services and must not be disrupted); repositories are cloned under `~/Documents/projects/`.
 - Series identifiers verified against the live APIs on 2026-10-30 (see the [M1 note](docs/notes/m1-ingestion.md)). StatCan vectors: CPI Ontario 41691919, unemployment rate Ontario 2063949.
 - Test fixtures are trimmed responses recorded on 2026-10-30; edge cases (empty or null values) use inline synthetic payloads in the tests.
 - WDS coordinates need all 10 positions; `cdm find-vector` pads them.
