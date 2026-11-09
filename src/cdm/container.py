@@ -1,7 +1,8 @@
 """Start and stop the Oracle container with Docker Compose (docker-compose.yml, ADR 0009).
 
 Plain `docker compose` commands run through subprocess, so the same `uv run cdm oracle up`
-works in PowerShell, macOS and Linux. Docker Desktop must be installed and running.
+works on Linux, macOS and Windows. Docker must be installed and running: Docker Engine on
+Linux (docs/qa/m4-oracle-source.md), Docker Desktop on Windows and macOS.
 """
 
 from __future__ import annotations
@@ -12,13 +13,20 @@ import subprocess
 from cdm import settings
 
 DOCKER_MISSING = (
-    "Docker is not installed or not on PATH. Install Docker Desktop "
-    "(https://docs.docker.com/desktop/setup/install/windows-install/), start it, open a new "
-    "PowerShell window and run the command again."
+    "Docker is not installed or not on PATH. On Ubuntu: "
+    "`sudo apt install -y docker.io docker-compose-v2` (see docs/qa/m4-oracle-source.md). "
+    "On Windows or macOS: install Docker Desktop "
+    "(https://docs.docker.com/desktop/), start it and open a new terminal. "
+    "Then run the command again."
 )
 DOCKER_NOT_RUNNING = (
-    "Docker is installed but not running. Start Docker Desktop, wait until it says "
-    '"Engine running", then run the command again.'
+    "Docker is installed but not running. On Ubuntu: `sudo systemctl start docker`. "
+    'On Windows or macOS: start Docker Desktop and wait until it says "Engine running". '
+    "Then run the command again."
+)
+DOCKER_NO_PERMISSION = (
+    "Your user cannot use Docker yet (permission denied on the Docker socket). On Ubuntu: "
+    "`sudo usermod -aG docker $USER`, then log out and log in again, then run the command again."
 )
 
 
@@ -36,6 +44,8 @@ def check_docker() -> None:
         raise DockerError(DOCKER_MISSING)
     probe = subprocess.run(["docker", "info"], capture_output=True, text=True)
     if probe.returncode != 0:
+        if "permission denied" in (probe.stderr or "").lower():
+            raise DockerError(DOCKER_NO_PERMISSION)
         raise DockerError(DOCKER_NOT_RUNNING)
 
 
